@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prova de nivell inicial · 1r d’ESO</title>
+<link rel="stylesheet" href="assets/css/eina.css">
+<link rel="stylesheet" href="assets/css/imprimir.css" media="print">
+</head>
+<body>
+
+<header id="barra">
+  <div class="marca">Prova de nivell inicial <span>1r d&rsquo;ESO</span></div>
+  <div id="resum" class="resum"></div>
+  <div class="accions">
+    <select id="veure" title="Qu&egrave; vols veure al centre">
+      <option value="veu-prova">Veure la prova</option>
+      <option value="veu-clau">Veure la clau</option>
+    </select>
+    <button id="imp-prova">Imprimeix la prova</button>
+    <button id="imp-clau" class="sec">Imprimeix la clau</button>
+  </div>
+</header>
+
+<main>
+  <aside id="panell"></aside>
+  <div id="centre" class="veu-prova">
+    <div id="prova" class="doc"></div>
+    <div id="clau" class="doc"></div>
+  </div>
+</main>
+
+<script src="assets/js/atzar.js"></script>
+<script src="assets/js/generadors.js"></script>
+<script src="assets/js/cb.js"></script>
+<script src="assets/js/composa.js"></script>
+<script src="assets/js/full.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

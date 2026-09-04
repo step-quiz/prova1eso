@@ -1,0 +1,136 @@
+/* eina.css — pantalla */
+:root{
+  --blau:#12507a; --blau-cl:#eef3f7; --vora:#c9d6e0; --gris:#5a5a5a;
+  --paper:#fff; --fons:#eceff2;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--fons); color:#1a1a1a;
+}
+
+/* ------------------------------------------------------------- barra */
+#barra{
+  position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:16px;
+  background:var(--blau); color:#fff; padding:10px 18px;
+}
+.marca{font-weight:700}
+.marca span{font-weight:400; opacity:.8}
+.resum{margin-left:auto; font-size:13px; opacity:.95}
+.accions{display:flex; gap:8px}
+button,select,input{font:inherit}
+button{
+  border:0; border-radius:6px; padding:7px 14px; cursor:pointer;
+  background:#fff; color:var(--blau); font-weight:600;
+}
+button.sec{background:transparent; color:#fff; border:1px solid rgba(255,255,255,.55)}
+#veure{border-radius:6px; border:1px solid rgba(255,255,255,.55); background:transparent; color:#fff; padding:7px 10px}
+#veure option{color:#000}
+
+/* ------------------------------------------------------------ layout */
+main{display:grid; grid-template-columns:340px 1fr; align-items:start}
+#panell{
+  position:sticky; top:44px; max-height:calc(100vh - 44px); overflow:auto;
+  background:#fff; border-right:1px solid var(--vora); padding:14px;
+}
+#centre{padding:22px; display:flex; justify-content:center}
+#centre.veu-prova #clau{display:none}
+#centre.veu-clau #prova{display:none}
+
+/* ------------------------------------------------------------ panell */
+.grup{margin-bottom:22px}
+.grup h3{margin:0 0 4px; font-size:14px; color:var(--blau); text-transform:uppercase; letter-spacing:.4px}
+.ajuda{margin:0 0 10px; font-size:12px; color:var(--gris); line-height:1.35}
+.fila{display:flex; align-items:center; gap:8px; margin:6px 0}
+.fila .et{flex:0 0 108px; font-size:13px; color:var(--gris)}
+.txt,.codi{flex:1; padding:5px 8px; border:1px solid var(--vora); border-radius:5px}
+.codi{width:80px; flex:0 0 80px; text-transform:uppercase; letter-spacing:3px; font-weight:700; text-align:center}
+.num{width:56px; padding:4px 6px; border:1px solid var(--vora); border-radius:5px}
+.niv{padding:4px 6px; border:1px solid var(--vora); border-radius:5px; background:#fff}
+.check{display:flex; gap:7px; align-items:flex-start; margin:4px 0; font-size:13.5px; cursor:pointer}
+.check input{margin-top:3px}
+.gen{border:1px solid var(--vora); border-radius:7px; padding:8px 10px; margin-bottom:7px}
+.gen.off{opacity:.5}
+.gen .ctrl{display:flex; gap:6px; align-items:center; margin:6px 0 2px}
+.mini{font-size:11.5px; color:var(--gris)}
+.destresa{margin:2px 0 0; font-size:11.5px; color:var(--gris); font-style:italic}
+.sentits{display:grid; grid-template-columns:1fr 1fr; gap:0 8px; margin-top:6px}
+.fulls{max-height:340px; overflow:auto; border:1px solid var(--vora); border-radius:7px; padding:8px}
+.bloc-tit{margin:9px 0 3px; font-size:12px; font-weight:700; color:var(--blau)}
+.bloc-tit .any{font-weight:400; color:var(--gris)}
+.full-check{font-size:12.5px}
+.dif{font-size:11px; padding:0 5px; border-radius:8px; background:#e6f0e6}
+.dif.d2{background:#fdf1d8} .dif.d3{background:#fadcda}
+
+/* -------------------------------------------------------------- full */
+.doc{width:210mm}
+.pagina{
+  background:var(--paper); width:210mm; min-height:297mm; padding:18mm 20mm 16mm;
+  margin:0 auto 18px; box-shadow:0 1px 6px rgba(0,0,0,.16);
+  font-family:Helvetica,Arial,sans-serif; color:#111; font-size:11pt; line-height:1.45;
+}
+.pagina h1{font-size:21pt; color:var(--blau); margin:0 0 2mm}
+.pagina h2{font-size:12pt; color:var(--blau); margin:8mm 0 2mm}
+.tit-part{font-size:15pt !important; margin-top:0 !important}
+.pagina .sub{color:var(--gris); font-size:10pt; margin:0 0 4mm}
+.portada{padding-top:22mm}
+
+.dades{margin:6mm 0 8mm}
+.dades label{display:block; font-size:10pt; color:var(--gris); margin-bottom:5mm}
+.dades label span{display:block; border-bottom:1px solid #98a9b6; height:7mm}
+.dades .mig{display:inline-block; width:48%}
+.dades .mig+.mig{margin-left:3%}
+
+.avisos{margin:0 0 4mm; padding-left:5mm}
+.avisos li{margin-bottom:2mm}
+table.parts{width:100%; border-collapse:collapse; background:var(--blau-cl)}
+table.parts td{padding:2.5mm 3mm; font-size:10.5pt}
+table.parts .p{font-weight:700; width:20mm}
+table.parts .t{color:var(--gris); font-style:italic; text-align:right}
+.codi-peu{margin-top:10mm; font-size:9pt; color:var(--gris)}
+
+.item{margin:0 0 6mm; page-break-inside:avoid; break-inside:avoid}
+.enun .num{font-weight:700; color:var(--blau); margin-right:2mm}
+.subs{margin:2mm 0 0 6mm}
+.subs.cols{display:grid; grid-template-columns:1fr 1fr; gap:3mm 5mm}
+.sub{margin:1.5mm 0}
+.sub .ap{font-weight:700; color:var(--gris); margin-right:1.5mm}
+.caixa{display:inline-block; width:22mm; height:8mm; border:1px solid #8fa6b6; border-radius:2px; vertical-align:middle; margin:0 2mm}
+.op{color:var(--gris)}
+.linia{display:inline-block; min-width:60mm; border-bottom:1px solid #98a9b6; height:6mm; vertical-align:bottom}
+.graella{
+  border:1px solid #aebfcb; margin:2mm 0;
+  background-image:linear-gradient(#dfe7ec 1px,transparent 1px),linear-gradient(90deg,#dfe7ec 1px,transparent 1px);
+  background-size:5mm 5mm;
+}
+.ratlles{margin:2mm 0}
+.ratlla{border-bottom:1px solid #b9c6d1; height:7.5mm}
+.fig{display:block; margin:2mm 0 3mm}
+.fig-sub{display:flex; align-items:center; gap:3mm}
+
+.cb{margin:0 0 7mm; page-break-inside:avoid; break-inside:avoid}
+.cb-cap{display:flex; align-items:center; gap:3mm; margin-bottom:1.5mm}
+.cb-cap .tag{background:var(--blau); color:#fff; font-size:8.5pt; font-weight:700; padding:1mm 2.5mm; border-radius:2px}
+.cb-cap .act{font-size:9pt; color:var(--gris)}
+.cb-cap .ctx{font-size:8.5pt; color:#8a6d1f; background:#fdf1d8; padding:.6mm 2mm; border-radius:2px}
+.cb img{width:100%; display:block}
+
+table.fitxa{width:100%; border-collapse:collapse; margin-top:3mm}
+table.fitxa th{font-size:9pt; color:var(--gris); text-align:left; border-bottom:1px solid #98a9b6; padding:1.5mm}
+table.fitxa td{padding:1.6mm; border-bottom:1px solid #e2e9ee; font-size:10pt}
+table.fitxa .q{width:12mm}
+table.fitxa .q::after{content:""; display:block; width:7mm; height:7mm; border:1px solid #8fa6b6; border-radius:2px}
+
+table.clau{width:100%; border-collapse:collapse; margin-bottom:5mm; font-size:9.5pt}
+table.clau th{background:var(--blau-cl); text-align:left; padding:1.8mm; border-bottom:1px solid var(--vora)}
+table.clau td{padding:1.8mm; border-bottom:1px solid #e2e9ee; vertical-align:top}
+table.clau .sol{font-weight:700; color:var(--blau); text-transform:uppercase}
+table.clau tr{page-break-inside:avoid}
+.niv{font-size:8pt; background:#eceff2; border-radius:8px; padding:0 5px; color:var(--gris)}
+
+@media (max-width:1100px){
+  main{grid-template-columns:1fr}
+  #panell{position:static; max-height:none; border-right:0; border-bottom:1px solid var(--vora)}
+  .doc,.pagina{width:100%; min-height:0}
+}
