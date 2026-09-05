@@ -134,3 +134,21 @@ table.clau tr{page-break-inside:avoid}
   #panell{position:static; max-height:none; border-right:0; border-bottom:1px solid var(--vora)}
   .doc,.pagina{width:100%; min-height:0}
 }
+
+/* ------------------------------------------------- portada editable */
+.ed{ cursor:text; border-radius:2px; }
+.ed:hover{ box-shadow:inset 0 -2px 0 #cfe0ec; }
+.ed:focus{ outline:2px solid #7fb0d0; outline-offset:2px; background:#fbfdff; }
+.ed:empty::before{ content:'escriu-hi\00a0aqu\00ed\2026'; color:#a8b4bd; }
+.portada .extra{ margin:6mm 0 0; font-size:10.5pt; min-height:5mm; }
+.ed-nota{
+  background:#fff8e1; border:1px dashed #e0c98a; border-radius:5px;
+  padding:2mm 3mm; font-size:8.5pt; color:#6b5a2a; margin:0 0 6mm;
+}
+.ed-btn{
+  border:1px solid var(--vora); background:#fff; color:var(--gris);
+  font-size:10px; line-height:1; padding:2px 6px; margin-left:5px;
+  border-radius:10px; cursor:pointer; vertical-align:middle; font-weight:600;
+}
+.ed-btn:hover{ background:#f2f6f9; color:var(--blau); border-color:#9fc0d6; }
+.dades label .ed-btn{ float:right; }

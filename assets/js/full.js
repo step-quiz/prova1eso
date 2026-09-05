@@ -90,30 +90,111 @@
     return h + '</div>';
   }
 
+  /* ---- text editable de la portada ------------------------------------ */
+  /* Tot el text de la portada viu aquí i es pot reescriure des de la pàgina.
+     Entre claus, els valors que es calculen sols: {codi} {model} {curs} {data}
+     {n1} {n2} {n3} {preg1} {preg2} {preg3} {min1} {min2} {min3} {minuts} */
+  function portadaPerDefecte() {
+    return {
+      titol: 'Prova inicial de Matem\u00e0tiques',
+      subtitol: '{curs} \u00b7 {data}',
+      camps: ['Nom i cognoms', 'Grup', 'Escola de prim\u00e0ria'],
+      h2avisos: 'Abans de comen\u00e7ar, llegeix aix\u00f2',
+      avisos: [
+        '<b>Aquesta prova no t\u00e9 nota.</b> Serveix perqu\u00e8 el professorat s\u00e0piga qu\u00e8 ja saps fer i qu\u00e8 t\u2019hem d\u2019ensenyar. Ning\u00fa no aprova ni suspèn.',
+        'Hi ha preguntes f\u00e0cils i preguntes dif\u00edcils. <b>\u00c9s normal que no ho s\u00e0piguis tot</b>.',
+        'Si una pregunta se\u2019t fa molt dif\u00edcil, <b>deixa-la i passa a la seg\u00fcent</b>.',
+        '\u00c9s millor <b>provar-ho i escriure el que penses</b> que deixar-ho en blanc.',
+        'No es pot fer servir la calculadora.'
+      ],
+      h2parts: 'Com est\u00e0 organitzada',
+      parts: {
+        p1: { nom: 'PART 1', desc: 'C\u00e0lcul i escriptura', quant: '{preg1}', temps: '{min1} min' },
+        p2: { nom: 'PART 2', desc: 'Situacions (una sola resposta correcta)', quant: '{preg2}', temps: '{min2} min' },
+        p3: { nom: 'PART 3', desc: 'Repte \u2014 <i>no cal acabar-lo</i>', quant: '{preg3}', temps: '{min3} min' }
+      },
+      extra: '',
+      peu: 'codi {codi} \u00b7 model {model}'
+    };
+  }
+
+
+  function subst(t, v) {
+    return String(t == null ? '' : t).replace(/\{(\w+)\}/g, function (m, k) {
+      return v[k] !== undefined ? v[k] : m;
+    });
+  }
+
+  function plural(n, s, p) { return n + ' ' + (n === 1 ? s : p); }
+
+  function vars(estat, doc) {
+    var n1 = doc.part1.length, n2 = doc.nPreg2, n3 = doc.part3.length, o = estat.opcions;
+    return {
+      codi: estat.codi, model: estat.model, curs: estat.curs, data: estat.data,
+      n1: n1, n2: n2, n3: n3,
+      preg1: plural(n1, 'pregunta', 'preguntes'),
+      preg2: plural(n2, 'pregunta', 'preguntes'),
+      preg3: plural(n3, 'repte', 'reptes'),
+      min1: o.min1, min2: o.min2, min3: o.min3,
+      minuts: (n1 ? o.min1 : 0) + (n2 ? o.min2 : 0) + (n3 ? o.min3 : 0)
+    };
+  }
+
+  /* un tros de text que es pot reescriure des de la pàgina */
+  function ed(cami, txt, tag, cls) {
+    tag = tag || 'span';
+    return '<' + tag + ' class="ed' + (cls ? ' ' + cls : '') + '" data-camp="' + cami + '">' +
+      txt + '</' + tag + '>';
+  }
+
+  function botoEd(accio, i, txt, titol) {
+    return '<button class="ed-btn" data-accio="' + accio + '"' +
+      (i === null ? '' : ' data-i="' + i + '"') + ' title="' + titol + '">' + txt + '</button>';
+  }
+
   /* ------------------------------------------------------------- la prova */
   function prova(estat, doc) {
     var h = '';
     var nPart1 = doc.part1.length, nPart2 = doc.nPreg2, nPart3 = doc.part3.length;
 
     if (estat.opcions.portada) {
+      var P = estat.portada || portadaPerDefecte(), v = vars(estat, doc);
       h += '<section class="pagina portada">';
-      h += '<h1>Prova inicial de Matem\u00e0tiques</h1>';
-      h += '<p class="sub">' + esc(estat.curs) + ' \u00b7 ' + esc(estat.data) + '</p>';
-      h += '<div class="dades"><label>Nom i cognoms<span></span></label>' +
-        '<label class="mig">Grup<span></span></label><label class="mig">Escola de prim\u00e0ria<span></span></label></div>';
-      h += '<h2>Abans de comen\u00e7ar, llegeix aix\u00f2</h2><ul class="avisos">' +
-        '<li><b>Aquesta prova no t\u00e9 nota.</b> Serveix perqu\u00e8 el professorat s\u00e0piga qu\u00e8 ja saps fer i qu\u00e8 t\u2019hem d\u2019ensenyar. Ning\u00fa no aprova ni suspèn.</li>' +
-        '<li>Hi ha preguntes f\u00e0cils i preguntes dif\u00edcils. <b>\u00c9s normal que no ho s\u00e0piguis tot</b>.</li>' +
-        '<li>Si una pregunta se\u2019t fa molt dif\u00edcil, <b>deixa-la i passa a la seg\u00fcent</b>.</li>' +
-        '<li>\u00c9s millor <b>provar-ho i escriure el que penses</b> que deixar-ho en blanc.</li>' +
-        (estat.opcions.calculadora ? '' : '<li>No es pot fer servir la calculadora.</li>') +
-        '</ul>';
-      h += '<h2>Com est\u00e0 organitzada</h2><table class="parts">';
-      if (nPart1) h += '<tr><td class="p">PART 1</td><td>C\u00e0lcul i escriptura</td><td>' + nPart1 + ' preguntes</td><td class="t">' + estat.opcions.min1 + ' min</td></tr>';
-      if (nPart2) h += '<tr><td class="p">PART 2</td><td>Situacions (una sola resposta correcta)</td><td>' + nPart2 + ' preguntes</td><td class="t">' + estat.opcions.min2 + ' min</td></tr>';
-      if (nPart3) h += '<tr><td class="p">PART 3</td><td>Repte \u2014 <i>no cal acabar-lo</i></td><td>' + nPart3 + ' preguntes</td><td class="t">' + estat.opcions.min3 + ' min</td></tr>';
+      h += '<p class="ed-nota">Escriu directament a sobre de qualsevol text d\u2019aquesta p\u00e0gina: es desa tot sol. ' +
+        'Pots fer servir <b>{codi}</b>, <b>{model}</b>, <b>{curs}</b>, <b>{data}</b>, <b>{preg1}</b>, <b>{min1}</b>\u2026 ' +
+        'i s\u2019hi posar\u00e0 el valor de cada moment.</p>';
+      h += '<h1>' + ed('portada.titol', subst(P.titol, v)) + '</h1>';
+      h += '<p class="sub">' + ed('portada.subtitol', subst(P.subtitol, v)) + '</p>';
+
+      h += '<div class="dades">';
+      P.camps.forEach(function (c, i) {
+        h += '<label' + (i > 0 ? ' class="mig"' : '') + '>' +
+          ed('portada.camps.' + i, subst(c, v)) +
+          botoEd('camp-treu', i, '\u00d7', 'treu aquest camp') +
+          '<span></span></label>';
+      });
+      h += botoEd('camp-afegeix', null, '+ camp', 'afegeix un camp per emplenar') + '</div>';
+
+      h += '<h2>' + ed('portada.h2avisos', subst(P.h2avisos, v)) + '</h2><ul class="avisos">';
+      P.avisos.forEach(function (a, i) {
+        h += '<li>' + ed('portada.avisos.' + i, subst(a, v)) +
+          botoEd('avis-treu', i, '\u00d7', 'treu aquesta l\u00ednia') + '</li>';
+      });
+      h += '</ul>' + botoEd('avis-afegeix', null, '+ l\u00ednia', 'afegeix un avís');
+
+      h += '<h2>' + ed('portada.h2parts', subst(P.h2parts, v)) + '</h2><table class="parts">';
+      [['p1', nPart1], ['p2', nPart2], ['p3', nPart3]].forEach(function (x) {
+        if (!x[1]) return;
+        var f = P.parts[x[0]], c = 'portada.parts.' + x[0] + '.';
+        h += '<tr><td class="p">' + ed(c + 'nom', subst(f.nom, v)) + '</td>' +
+          '<td>' + ed(c + 'desc', subst(f.desc, v)) + '</td>' +
+          '<td>' + ed(c + 'quant', subst(f.quant, v)) + '</td>' +
+          '<td class="t">' + ed(c + 'temps', subst(f.temps, v)) + '</td></tr>';
+      });
       h += '</table>';
-      h += '<p class="codi-peu">codi ' + estat.codi + ' \u00b7 model ' + estat.model + '</p>';
+
+      h += ed('portada.extra', subst(P.extra, v), 'p', 'extra');
+      h += ed('portada.peu', subst(P.peu, v), 'p', 'codi-peu');
       h += '</section>';
     }
 
@@ -224,5 +305,5 @@
     return h;
   }
 
-  w.FULL = { prova: prova, clau: clau };
+  w.FULL = { prova: prova, clau: clau, portadaPerDefecte: portadaPerDefecte, subst: subst };
 })(window);

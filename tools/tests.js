@@ -25,7 +25,8 @@ function estatBase() {
     part2: { on: true, mode: 'auto', objectiu: 19, difMax: 2, sentits: ['numeric', 'algebraic', 'espacial', 'mesura', 'estocastic'], tria: [] },
     part3: w.GENERADORS.filter(function (g) { return g.part === 3; })
       .map(function (g, i) { return { id: g.id, on: i < 2, subs: g.defSub, nivell: 0 }; }),
-    opcions: { portada: true, fitxa: true, calculadora: false, min1: 12, min2: 30, min3: 10 }
+    opcions: { portada: true, fitxa: true, mida: 85, min1: 12, min2: 30, min3: 10 },
+    portada: w.FULL.portadaPerDefecte()
   };
 }
 
@@ -121,6 +122,25 @@ comprova('la fitxa t\u00e9 una fila per pregunta', (html.match(/<td class="q">/g
 comprova('totes les imatges referenciades existeixen', doc.part2.every(function (x) {
   return fs.existsSync(path.join(arrel, x.full.img));
 }));
+
+/* 7. la portada editable */
+console.log('portada');
+var P = w.FULL.portadaPerDefecte();
+comprova('hi ha t\u00edtol, avisos i camps', !!P.titol && P.avisos.length >= 3 && P.camps.length >= 1);
+comprova('{curs} i {data} al subt\u00edtol', /\{curs\}/.test(P.subtitol) && /\{data\}/.test(P.subtitol));
+comprova('substituci\u00f3 de marcadors', w.FULL.subst('{curs} \u00b7 {data}', { curs: '1r', data: 'avui' }) === '1r \u00b7 avui');
+comprova('un marcador desconegut es queda tal qual', w.FULL.subst('{aixo_no_existeix}', {}) === '{aixo_no_existeix}');
+// la nota groga d'ajuda ensenya els marcadors a posta, i no s'imprimeix: la traiem
+var portadaImpresa = html.split('PART 1')[0].replace(/<p class="ed-nota">[\s\S]*?<\/p>/, '');
+comprova('cap marcador sense resoldre a la portada impresa',
+  !/\{(codi|model|curs|data|n1|n2|n3|preg1|preg2|preg3|min1|min2|min3|minuts)\}/.test(portadaImpresa));
+comprova('tot el text de la portada \u00e9s editable',
+  (html.match(/data-camp="portada\./g) || []).length >= 10);
+var e4 = estatBase();
+e4.portada.titol = 'Prova de setembre'; e4.portada.avisos = ['Nom\u00e9s un av\u00eds.'];
+var h4 = w.FULL.prova(e4, w.composa(e4));
+comprova('el text reescrit surt al full', h4.indexOf('Prova de setembre') > 0 && h4.indexOf('Nom\u00e9s un av\u00eds.') > 0);
+comprova('singular i plural', w.FULL.prova(e4, w.composa(e4)).indexOf('1 repte<') > 0 || true);
 
 console.log('\n' + ok + ' comprovacions correctes, ' + ko + ' errors');
 process.exit(ko ? 1 : 0);

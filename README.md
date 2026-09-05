@@ -35,6 +35,27 @@ El botó *Altres nombres* tira un codi nou.
 La configuració sencera es desa a l'adreça (després del `#`). Desa-la als preferits o
 enganxa-la en un correu i qui l'obri veurà exactament la mateixa prova.
 
+### La portada s'escriu sobre el full
+
+Tot el text de la portada és editable **directament a la pàgina**: clica-hi a sobre i reescriu-lo.
+Títol, subtítol, els camps per emplenar, el titular dels avisos, cada avís, el titular del quadre,
+cada cel·la del quadre de parts, el paràgraf lliure del final i el peu. Els botons `×` treuen una
+línia o un camp i `+ línia` / `+ camp` n'afegeixen.
+
+Es desa tot sol a l'adreça, com la resta de la configuració. *Portada → Recupera el text original*
+torna al text de sèrie.
+
+El que escriguis entre claus se substitueix en imprimir:
+
+| | | | |
+|---|---|---|---|
+| `{codi}` `{model}` | `{curs}` `{data}` | `{n1}` `{n2}` `{n3}` nombre de preguntes | `{min1}` `{min2}` `{min3}` `{minuts}` |
+
+`{preg1}` `{preg2}` `{preg3}` ja porten el nom i el plural resolts: *9 preguntes*, *1 repte*.
+
+En enganxar text només se'n conserven la negreta i la cursiva; la resta de format es descarta.
+Els botons i la nota groga d'ajuda no s'imprimeixen mai.
+
 ### Imprimir
 
 Dos botons: **la prova** (alumnat) i **la clau** (professorat, amb el diagnòstic per distractor).

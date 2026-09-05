@@ -22,7 +22,8 @@
       part3: w.GENERADORS.filter(function (g) { return g.part === 3; }).map(function (g, i) {
         return { id: g.id, on: i < 2, subs: g.defSub, nivell: 0 };
       }),
-      opcions: { portada: true, fitxa: true, calculadora: false, mida: 85, min1: 12, min2: 30, min3: 10 }
+      opcions: { portada: true, fitxa: true, mida: 85, min1: 12, min2: 30, min3: 10 },
+      portada: w.FULL.portadaPerDefecte()
     };
   }
 
@@ -44,6 +45,17 @@
         ['codi', 'model', 'curs', 'data', 'nivell'].forEach(function (k) { if (o[k] !== undefined) base[k] = o[k]; });
         if (o.part2) Object.keys(o.part2).forEach(function (k) { base.part2[k] = o.part2[k]; });
         if (o.opcions) Object.keys(o.opcions).forEach(function (k) { base.opcions[k] = o.opcions[k]; });
+        if (o.portada) {
+          Object.keys(o.portada).forEach(function (k) {
+            if (k === 'parts') {
+              Object.keys(o.portada.parts || {}).forEach(function (r) {
+                if (base.portada.parts[r]) Object.keys(o.portada.parts[r]).forEach(function (c) {
+                  base.portada.parts[r][c] = o.portada.parts[r][c];
+                });
+              });
+            } else { base.portada[k] = o.portada[k]; }
+          });
+        }
         [['part1', 'part1'], ['part3', 'part3']].forEach(function (par) {
           (o[par[0]] || []).forEach(function (c) {
             base[par[1]].forEach(function (b) { if (b.id === c.id) { b.on = c.on; b.subs = c.subs; b.nivell = c.nivell; } });
@@ -222,11 +234,19 @@
     });
     p.appendChild(g3);
 
+    /* --- portada */
+    var gp = bloc('Portada',
+      'Tot el text de la portada s\u2019escriu <b>directament sobre el full</b>: clica-hi a sobre i reescriu-lo. ' +
+      'El que posis entre claus \u2014 {codi}, {curs}, {preg1}, {min1}\u2026 \u2014 se substitueix pel valor de cada moment.');
+    gp.appendChild(check('incloure la portada', E.opcions.portada, function (v) { E.opcions.portada = v; }));
+    var rp = el('button', 'sec', 'Recupera el text original');
+    rp.addEventListener('click', function () { E.portada = w.FULL.portadaPerDefecte(); pinta(); });
+    gp.appendChild(fila('', rp));
+    p.appendChild(gp);
+
     /* --- opcions */
     var g4 = bloc('El document');
-    g4.appendChild(check('portada amb instruccions', E.opcions.portada, function (v) { E.opcions.portada = v; }));
     g4.appendChild(check('fitxa de respostes de la Part 2', E.opcions.fitxa, function (v) { E.opcions.fitxa = v; }));
-    g4.appendChild(check('es pot fer servir la calculadora', E.opcions.calculadora, function (v) { E.opcions.calculadora = v; }));
     var md = el('select', 'niv');
     [[100, 'grans (100 %)'], [85, 'normals (85 %)'], [70, 'petits (70 %) — menys paper']].forEach(function (o) {
       md.appendChild(new Option(o[1], String(o[0]), false, E.opcions.mida === o[0]));
@@ -247,6 +267,74 @@
     return null;
   }
 
+  /* ------------------------------------------- edició directa a la portada */
+
+  /* de 'portada.parts.p1.nom' al lloc de l'estat que toca */
+  function posaCami(cami, valor) {
+    var t = cami.split('.'), o = E;
+    for (var i = 0; i < t.length - 1; i++) o = o[t[i]];
+    o[t[t.length - 1]] = valor;
+  }
+
+  /* del que enganxa el navegador només ens quedem negreta, cursiva i salt */
+  function netejaHTML(html) {
+    var caixa = d.createElement('div');
+    caixa.innerHTML = html;
+    var permes = { B: 1, I: 1, EM: 1, STRONG: 1, BR: 1 };
+    for (var volta = 0; volta < 6; volta++) {
+      var dolents = [];
+      Array.prototype.forEach.call(caixa.querySelectorAll('*'), function (n) {
+        if (!permes[n.tagName]) dolents.push(n);
+        else { n.removeAttribute('style'); n.removeAttribute('class'); }
+      });
+      if (!dolents.length) break;
+      dolents.forEach(function (n) {
+        while (n.firstChild) n.parentNode.insertBefore(n.firstChild, n);
+        n.parentNode.removeChild(n);
+      });
+    }
+    return caixa.innerHTML.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function editable() {
+    var zona = d.getElementById('prova');
+
+    Array.prototype.forEach.call(zona.querySelectorAll('.ed'), function (n) {
+      n.contentEditable = 'true';
+      n.spellcheck = true;
+
+      n.addEventListener('paste', function (ev) {          // enganxar sempre en text pla
+        ev.preventDefault();
+        var t = (ev.clipboardData || w.clipboardData).getData('text');
+        d.execCommand('insertText', false, t);
+      });
+
+      n.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter') { ev.preventDefault(); n.blur(); }
+        if (ev.key === 'Escape') { n.blur(); }
+      });
+
+      n.addEventListener('blur', function () {
+        var net = netejaHTML(n.innerHTML);
+        n.innerHTML = net;
+        posaCami(n.dataset.camp, net);
+        desa();
+      });
+    });
+
+    Array.prototype.forEach.call(zona.querySelectorAll('.ed-btn'), function (b) {
+      b.addEventListener('click', function () {
+        var i = parseInt(b.dataset.i, 10);
+        var P = E.portada;
+        if (b.dataset.accio === 'avis-treu' && P.avisos.length > 1) P.avisos.splice(i, 1);
+        if (b.dataset.accio === 'avis-afegeix') P.avisos.push('Escriu aqu\u00ed el teu av\u00eds.');
+        if (b.dataset.accio === 'camp-treu' && P.camps.length > 1) P.camps.splice(i, 1);
+        if (b.dataset.accio === 'camp-afegeix') P.camps.push('Camp nou');
+        pinta();
+      });
+    });
+  }
+
   /* ----------------------------------------------------------- render */
   function pinta() {
     var doc = w.composa(E);
@@ -258,6 +346,7 @@
       '<b>' + doc.part1.length + '</b> preguntes obertes \u00b7 <b>' + doc.nPreg2 + '</b> de CB en ' +
       doc.part2.length + ' fulls \u00b7 <b>' + doc.part3.length + '</b> reptes \u00b7 ~<b>' + t + ' min</b>';
     panell();
+    if (E.opcions.portada) editable();
     desa();
   }
 

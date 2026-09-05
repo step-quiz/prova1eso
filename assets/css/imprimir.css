@@ -32,3 +32,8 @@ img{ max-width:100%; }
 
 /* que els fons de les taules i les etiquetes surtin realment impresos */
 *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+/* els ajuts d'edició no s'imprimeixen mai */
+.ed-btn, .ed-nota{ display:none !important; }
+.ed:hover, .ed:focus{ box-shadow:none !important; outline:0 !important; background:transparent !important; }
+.ed:empty::before{ content:'' !important; }
