@@ -35,6 +35,21 @@ El botó *Altres nombres* tira un codi nou.
 La configuració sencera es desa a l'adreça (després del `#`). Desa-la als preferits o
 enganxa-la en un correu i qui l'obri veurà exactament la mateixa prova.
 
+### El repte del patró
+
+La seqüència es dibuixa amb les tres primeres figures i **la quarta puntejada amb un «? pals» a sota**:
+així s'entén sense haver d'explicar la notació.
+
+Els quatre apartats van en ordre de dificultat, i el nombre d'apartats decideix fins on s'arriba:
+
+1. quants pals per fer la figura que està puntejada (comptar);
+2. tenim *N* pals i els gastem tots: quantes figures surten (desfer el patró);
+3. quants pals per fer-ne moltes, *per lògica*, sense dibuixar-les;
+4. «creus que en necessites 4 × n, o més, o menys?» — la resposta és *menys*, i és la porta d'entrada a `3n + 1`.
+
+El nivell només mou els nombres i pot canviar la família (quadrats o triangles); l'escala de preguntes
+és sempre la mateixa.
+
 ### La portada s'escriu sobre el full
 
 Tot el text de la portada és editable **directament a la pàgina**: clica-hi a sobre i reescriu-lo.

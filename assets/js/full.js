@@ -15,38 +15,42 @@
     return '<svg class="fig" viewBox="0 -2 ' + amp + ' ' + (h + 4) + '" width="330">' + s + '</svg>';
   }
 
-  function seqQuadrats(a) {
-    var s = '', L = 26, x = 0;
-    for (var t = 1; t <= 3; t++) {
-      for (var i = 0; i < t; i++) {
-        s += '<rect x="' + (x + i * L) + '" y="6" width="' + L + '" height="' + L + '" fill="none" stroke="#33546b" stroke-width="2"/>';
+  /* La seqüència: les tres primeres figures dibuixades, i la quarta puntejada
+     amb un "? pals" a sota, que és el que la fa llegible sense explicacions. */
+  function seqFigures(fam) {
+    var L = 26, dalt = 8, alt = 26, buit = 34, x = 0, s = '';
+    for (var t = 1; t <= 4; t++) {
+      var punt = (t === 4);
+      var estil = 'fill="none" stroke="#33546b" stroke-width="2"' +
+        (punt ? ' stroke-dasharray="4 3" opacity=".6"' : '');
+      var amp;
+      if (fam.id === 'triangles') {
+        amp = (t + 1) * (L / 2);
+        for (var i = 0; i < t; i++) {
+          var pt = [];
+          for (var j = i; j < i + 3; j++) pt.push([x + j * L / 2, (j % 2 === 0) ? dalt + alt : dalt]);
+          s += '<polygon points="' + pt.map(function (q) { return q.join(','); }).join(' ') + '" ' + estil + '/>';
+        }
+      } else {
+        amp = t * L;
+        for (var k = 0; k < t; k++) {
+          s += '<rect x="' + (x + k * L) + '" y="' + dalt + '" width="' + L + '" height="' + L + '" ' + estil + '/>';
+        }
       }
-      s += '<text x="' + x + '" y="' + (L + 22) + '" font-size="11" fill="#5a5a5a">' + t + ' \u2192 ' + (a * t + 1) + '</text>';
-      x += t * L + 46;
+      s += '<text x="' + (x + amp / 2) + '" y="' + (dalt + alt + 17) + '" font-size="12.5" text-anchor="middle" ' +
+        'fill="' + (punt ? '#8a6d1f' : '#3a3a3a') + '"' + (punt ? ' font-weight="bold"' : '') + '>' +
+        (punt ? '? pals' : (fam.a * t + fam.b) + ' pals') + '</text>';
+      x += amp + buit;
     }
-    return '<svg class="fig" viewBox="0 0 ' + x + ' 56" width="420">' + s + '</svg>';
+    var ample = x - buit + 8;
+    return '<svg class="fig" viewBox="-4 0 ' + ample + ' ' + (dalt + alt + 24) + '" width="' +
+      Math.round(ample * 1.25) + '">' + s + '</svg>';
   }
 
-  function seqTriangles() {
-    var s = '', L = 30, H = 26, dalt = 6, baix = 6 + H, x = 0;
-    for (var t = 1; t <= 3; t++) {
-      for (var i = 0; i < t; i++) {
-        var pt = [];
-        for (var j = i; j < i + 3; j++) pt.push([x + j * L / 2, (j % 2 === 0) ? baix : dalt]);
-        s += '<polygon points="' + pt.map(function (p) { return p.join(','); }).join(' ') +
-          '" fill="none" stroke="#33546b" stroke-width="2"/>';
-      }
-      s += '<text x="' + x + '" y="' + (baix + 14) + '" font-size="11" fill="#5a5a5a">' + t + ' \u2192 ' + (2 * t + 1) + '</text>';
-      x += (t + 1) * (L / 2) + 46;
-    }
-    return '<svg class="fig" viewBox="0 0 ' + x + ' 62" width="430">' + s + '</svg>';
-  }
-
-  function espai(it) {
-    var e = it.espai;
-    if (e === 'graella') return '<div class="graella" style="height:' + (it.alt || 26) + 'mm"></div>';
-    if (e === 'ratlles') {
-      var n = it.alt || 3, s = '';
+  function espai(tipus, alt) {
+    if (tipus === 'graella') return '<div class="graella" style="height:' + (alt || 26) + 'mm"></div>';
+    if (tipus === 'ratlles') {
+      var n = alt || 3, s = '';
       for (var i = 0; i < n; i++) s += '<div class="ratlla"></div>';
       return '<div class="ratlles">' + s + '</div>';
     }
@@ -69,19 +73,19 @@
     }
     if (it.espai === 'graella') {
       var t = s.txt.length < 40 ? '<b>' + s.txt + '</b>' : s.txt;
-      return '<div class="sub sub-graella">' + lletra + t + espai(it) + '</div>';
+      return '<div class="sub sub-graella">' + lletra + t + espai('graella', s.alt || it.alt) + '</div>';
     }
-    return '<div class="sub">' + lletra + s.txt + espai(it) + '</div>';
+    return '<div class="sub">' + lletra + s.txt + espai(s.espai || it.espai, s.alt || it.alt) + '</div>';
   }
 
   function itemHTML(it, num) {
     var h = '<div class="item"><div class="enun"><span class="num">' + num + '.</span> ';
     h += it.cap || it.subs[0].txt;
     h += '</div>';
-    if (it.figuraCap) h += (it.ctx.fam && it.ctx.fam.id === 'triangles' ? seqTriangles() : seqQuadrats(it.ctx.fam ? it.ctx.fam.a : 3));
+    if (it.figuraCap && it.ctx.fam) h += seqFigures(it.ctx.fam);
     var multi = it.subs.length > 1 || it.cap;
     if (!multi) {
-      h += espai(it);
+      h += espai(it.espai, it.alt);
     } else {
       h += '<div class="subs' + (it.espai === 'graella' && it.subs.length >= 2 ? ' cols' : '') + '">';
       it.subs.forEach(function (s, i) { h += subHTML(it, s, i); });
@@ -220,7 +224,7 @@
 
     if (nPart3) {
       h += '<section class="pagina"><h2 class="tit-part">PART 3 \u00b7 Repte</h2>' +
-        '<p class="sub">Aqu\u00ed no cal que ho acabis tot. El que ens interessa \u00e9s <b>com ho penses</b>: escriu-ho, encara que no arribis al final.</p>';
+        '<p class="sub">Aquest \u00e9s un treball d\u2019investigaci\u00f3: <b>tot el que apuntis o escriguis ser\u00e0 molt interessant!</b></p>';
       doc.part3.forEach(function (it, i) { h += itemHTML(it, i + 1); });
       h += '</section>';
     }

@@ -326,27 +326,51 @@
 
   reg({
     id: 'patro', part: 3, titol: 'Patr\u00f3 de figures', sentit: 'algebraic',
-    destresa: 'Generalitzar un patró lineal',
-    minSub: 2, maxSub: 4, defSub: 3, espai: 'ratlles', alt: 3,
-    cap: function () { return 'Amb escuradents fem la seq\u00fc\u00e8ncia de figures seg\u00fcent:'; },
+    destresa: 'Generalitzar un patr\u00f3 lineal',
+    minSub: 1, maxSub: 4, defSub: 4, espai: 'ratlles', alt: 3,
+    cap: function () { return 'Amb pals fem la seq\u00fc\u00e8ncia de figures seg\u00fcent:'; },
     figuraCap: true,
-    sub: function (r, niv, i, ctx) {
-      var f = ctx.fam, a = f.a, b = f.b;
-      var demandes = [
-        function () { var k = r.enter(5, 8); return { txt: 'Quants escuradents necessitem per fer <b>' + k + ' ' + f.plural + '</b>?', sol: a + '\u00b7' + k + ' + ' + b + ' = ' + (a * k + b) }; },
-        function () { var k = r.tria([20, 25, 30, 50]); return { txt: 'I per fer <b>' + k + ' ' + f.plural + '</b>? Explica com ho has pensat <b>sense dibuixar-los tots</b>.', sol: a + '\u00b7' + k + ' + ' + b + ' = ' + (a * k + b) }; },
-        function () { return { txt: 'Si en fem <b>n</b>, quants escuradents necessitem? Escriu-ho amb una expressi\u00f3.', sol: a + '\u00b7n + ' + b + ' (o equivalent)' }; },
-        function () { var k = r.enter(8, 20), tot = a * k + b; return { txt: 'Tenim <b>' + tot + '</b> escuradents i els fem servir tots. Quantes figures surten?', sol: '(' + tot + ' \u2212 ' + b + ') : ' + a + ' = ' + k }; }
-      ];
-      var ordre = niv === 1 ? [0, 0, 1, 3] : niv === 2 ? [0, 1, 2, 3] : [1, 2, 3, 2];
-      return demandes[ordre[i % 4]]();
-    },
     context: function (r, niv) {
       var fams = [
-        { id: 'quadrats', a: 3, b: 1, plural: 'quadrats' },
-        { id: 'triangles', a: 2, b: 1, plural: 'triangles' }
+        { id: 'quadrats', a: 3, b: 1, ingenu: 4, sing: 'quadrat', plural: 'quadrats' },
+        { id: 'triangles', a: 2, b: 1, ingenu: 3, sing: 'triangle', plural: 'triangles' }
       ];
-      return { fam: niv === 1 ? fams[0] : r.tria(fams) };
+      var fam = niv === 1 ? fams[0] : r.tria(fams);
+      var k2 = niv === 1 ? 10 : niv === 2 ? r.tria([15, 20]) : r.tria([30, 50, 100]);
+      var kr = niv === 1 ? r.enter(6, 8) : niv === 2 ? r.enter(10, 14) : r.enter(12, 22);
+      return { fam: fam, seguent: 4, k2: k2, kr: kr, total: fam.a * kr + fam.b };
+    },
+    /* l'ordre dels apartats és l'ordre de dificultat: comptar la figura següent,
+       desfer el patró, saltar lluny sense dibuixar, i qüestionar la generalització ingènua */
+    sub: function (r, niv, i, ctx) {
+      var f = ctx.fam, a = f.a, b = f.b;
+      var d = [
+        {
+          txt: 'Quants pals calen per fer <b>' + ctx.seguent + ' ' + f.plural + '</b>?',
+          sol: a + '\u00b7' + ctx.seguent + ' + ' + b + ' = ' + (a * ctx.seguent + b) + ' pals',
+          espai: 'ratlles', alt: 1
+        },
+        {
+          txt: 'Tenim <b>' + ctx.total + ' pals</b> i els fem servir tots per construir ' + f.plural +
+            '. Quants ' + f.plural + ' hem aconseguit?',
+          sol: '(' + ctx.total + ' \u2212 ' + b + ') : ' + a + ' = ' + ctx.kr + ' ' + f.plural,
+          espai: 'ratlles', alt: 2
+        },
+        {
+          txt: 'Quants pals calen per fer <b>' + ctx.k2 + ' ' + f.plural + '</b>? Explica-ho <b>per l\u00f2gica</b>, ' +
+            'o sigui, sense dibuixar-los tots.',
+          sol: a + '\u00b7' + ctx.k2 + ' + ' + b + ' = ' + (a * ctx.k2 + b) + ' pals',
+          espai: 'ratlles', alt: 3
+        },
+        {
+          txt: 'Imagina que vols fer <b>n</b> ' + f.plural + '. Tu creus que necessites <b>' + f.ingenu +
+            ' \u00d7 n</b> pals, o b\u00e9 m\u00e9s, o b\u00e9 menys?',
+          sol: 'menys \u2014 en calen ' + a + '\u00b7n + ' + b + '. Cada ' + f.sing + ' nou nom\u00e9s afegeix ' + a +
+            ' pals, perqu\u00e8 n\u2019aprofita un del d\u2019abans.',
+          espai: 'ratlles', alt: 3
+        }
+      ];
+      return d[i % 4];
     }
   });
 
