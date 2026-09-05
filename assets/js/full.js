@@ -107,18 +107,16 @@
       avisos: [
         '<b>Aquesta prova no t\u00e9 nota.</b> Serveix perqu\u00e8 el professorat s\u00e0piga qu\u00e8 ja saps fer i qu\u00e8 t\u2019hem d\u2019ensenyar. Ning\u00fa no aprova ni suspèn.',
         'Hi ha preguntes f\u00e0cils i preguntes dif\u00edcils. <b>\u00c9s normal que no ho s\u00e0piguis tot</b>.',
-        'Si una pregunta se\u2019t fa molt dif\u00edcil, <b>deixa-la i passa a la seg\u00fcent</b>.',
-        '\u00c9s millor <b>provar-ho i escriure el que penses</b> que deixar-ho en blanc.',
-        'No es pot fer servir la calculadora.'
+        '\u00c9s millor <b>provar-ho i escriure el que penses</b> que deixar-ho en blanc.'
       ],
-      h2parts: 'Com est\u00e0 organitzada',
+      h2parts: 'La prova t\u00e9 3 parts:',
       parts: {
         p1: { nom: 'PART 1', desc: 'C\u00e0lcul i escriptura', quant: '{preg1}' },
-        p2: { nom: 'PART 2', desc: 'Situacions (una sola resposta correcta)', quant: '{preg2}' },
-        p3: { nom: 'PART 3', desc: 'Repte \u2014 <i>no cal acabar-lo</i>', quant: '{preg3}' }
+        p2: { nom: 'PART 2', desc: 'Problemes', quant: '{preg2}' },
+        p3: { nom: 'PART 3', desc: 'Reptes', quant: '{preg3}' }
       },
       extra: '',
-      peu: 'codi {codi} \u00b7 model {model}'
+      peu: '<br>'
     };
   }
 

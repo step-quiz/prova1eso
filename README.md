@@ -81,6 +81,13 @@ del curs o per passar-la a un company.
 L'adreça pública es configura a *El document → Adreça pública*. Si obres l'eina des d'un servidor
 (no des del disc), s'agafa l'adreça on està publicada i el camp s'ignora.
 
+### Els valors de fàbrica
+
+Són a `FABRICA`, a dalt de `app.js`, i a `portadaPerDefecte()`, a `full.js`. Ara mateix:
+nivell 1, Part 1 amb xifres, multiplicacions, divisions, ordenar, fraccions, percentatges i un
+problema d'un pas; Part 2 automàtica amb 4 preguntes fins a dificultat 2; Part 3 només el patró,
+amb els quatre apartats. Per canviar-los, edita la taula `FABRICA` i prou.
+
 ### Els teus valors inicials
 
 *Valors inicials → Desa aquests valors com a inicials* guarda la configuració en aquest navegador:
@@ -92,8 +99,7 @@ esborra el que has desat.
 Dos botons: **la prova** (alumnat) i **la clau** (professorat, amb el diagnòstic per distractor).
 Al diàleg del navegador, desmarca *Capçaleres i peus de pàgina*. Els marges els posa `@page`.
 
-Amb la configuració que ve de sèrie: 9 obertes + 20 de CB + 2 reptes ≈ **20 pàgines** (10 fulls a doble cara)
-i uns 52 minuts. Si vas just de fotocòpies, a *El document → Fulls de CB* baixa'ls al 70 %.
+Amb la configuració que ve de sèrie: 7 obertes + 4 de CB + 1 repte = **8 pàgines** (4 fulls a doble cara). Si vas just de fotocòpies, a *El document → Fulls de CB* baixa'ls al 70 %.
 
 ---
 

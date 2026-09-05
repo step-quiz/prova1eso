@@ -4,25 +4,67 @@
 
   var SENTITS_ORDRE = ['numeric', 'algebraic', 'espacial', 'mesura', 'estocastic'];
 
+  /* Els valors de fàbrica. Són la configuració real del departament, no un exemple:
+     nivell 1, sense restes ni sumes (ja hi ha multiplicar i dividir), Part 2 curta
+     i el repte del patró sencer. Si en vols uns altres, canvia'ls aquí. */
+  var FABRICA = {
+    nivell: 1,
+    curs: '1r d\u2019ESO',
+    data: '2026-27',
+    part1: {
+      xifres: { on: true, subs: 2 },
+      resta: { on: false, subs: 2 },
+      suma: { on: false, subs: 2 },
+      multiplicacio: { on: true, subs: 2 },
+      divisio: { on: true, subs: 2 },
+      ordena: { on: true, subs: 1 },
+      fraccio: { on: true, subs: 2 },
+      percentatges: { on: true, subs: 3 },
+      problema1: { on: true, subs: 1 },
+      problema2: { on: false, subs: 1 },
+      estimacio: { on: false, subs: 1 },
+      escriptura: { on: false, subs: 1 }
+    },
+    part3: {
+      patro: { on: true, subs: 4 },
+      tarifes: { on: false, subs: 2 },
+      coincidencies: { on: false, subs: 1 },
+      probabilitat: { on: false, subs: 2 }
+    },
+    part2: { on: true, mode: 'auto', objectiu: 4, difMax: 2 },
+    opcions: { portada: true, fitxa: true, mida: 85, base: 'https://prova1eso.step-quiz.net/' }
+  };
+
+  function ajust(taula, g) {
+    var f = taula[g.id] || {};
+    return {
+      id: g.id,
+      on: f.on !== undefined ? f.on : true,
+      subs: Math.max(g.minSub, Math.min(g.maxSub, f.subs !== undefined ? f.subs : g.defSub)),
+      nivell: 0
+    };
+  }
+
   function perDefecte() {
     return {
       codi: w.codiNou(),
       model: 'A',
-      curs: '1r d\u2019ESO',
-      data: '10 de setembre de 2026',
-      nivell: 2,
-      // per defecte, la selecció de la primera proposta: 9 preguntes
-      part1: w.GENERADORS.filter(function (g) { return g.part === 1; }).map(function (g) {
-        return { id: g.id, on: ['suma', 'problema1', 'estimacio'].indexOf(g.id) < 0, subs: g.defSub, nivell: 0 };
-      }),
+      curs: FABRICA.curs,
+      data: FABRICA.data,
+      nivell: FABRICA.nivell,
+      part1: w.GENERADORS.filter(function (g) { return g.part === 1; })
+        .map(function (g) { return ajust(FABRICA.part1, g); }),
       part2: {
-        on: true, mode: 'auto', objectiu: 19, difMax: 2,
+        on: FABRICA.part2.on, mode: FABRICA.part2.mode,
+        objectiu: FABRICA.part2.objectiu, difMax: FABRICA.part2.difMax,
         sentits: SENTITS_ORDRE.slice(), tria: []
       },
-      part3: w.GENERADORS.filter(function (g) { return g.part === 3; }).map(function (g, i) {
-        return { id: g.id, on: i < 2, subs: g.defSub, nivell: 0 };
-      }),
-      opcions: { portada: true, fitxa: true, mida: 85, base: 'https://prova1eso.step-quiz.net/' },
+      part3: w.GENERADORS.filter(function (g) { return g.part === 3; })
+        .map(function (g) { return ajust(FABRICA.part3, g); }),
+      opcions: {
+        portada: FABRICA.opcions.portada, fitxa: FABRICA.opcions.fitxa,
+        mida: FABRICA.opcions.mida, base: FABRICA.opcions.base
+      },
       portada: w.FULL.portadaPerDefecte()
     };
   }
