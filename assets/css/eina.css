@@ -24,7 +24,13 @@ button{
   border:0; border-radius:6px; padding:7px 14px; cursor:pointer;
   background:#fff; color:var(--blau); font-weight:600;
 }
-button.sec{background:transparent; color:#fff; border:1px solid rgba(255,255,255,.55)}
+/* .sec només és blanc sobre blau: dins del panell, blanc sobre blanc no es veia */
+#barra button.sec{background:transparent; color:#fff; border:1px solid rgba(255,255,255,.55)}
+#panell button{
+  background:#f2f6f9; color:var(--blau); border:1px solid var(--vora);
+  font-weight:600; padding:6px 12px; font-size:13px;
+}
+#panell button:hover{background:#e6eef4; border-color:#9fc0d6}
 #veure{border-radius:6px; border:1px solid rgba(255,255,255,.55); background:transparent; color:#fff; padding:7px 10px}
 #veure option{color:#000}
 

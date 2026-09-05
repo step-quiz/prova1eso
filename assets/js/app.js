@@ -22,7 +22,7 @@
       part3: w.GENERADORS.filter(function (g) { return g.part === 3; }).map(function (g, i) {
         return { id: g.id, on: i < 2, subs: g.defSub, nivell: 0 };
       }),
-      opcions: { portada: true, fitxa: true, mida: 85, min1: 12, min2: 30, min3: 10 },
+      opcions: { portada: true, fitxa: true, mida: 85, base: 'https://prova1eso.step-quiz.net/' },
       portada: w.FULL.portadaPerDefecte()
     };
   }
@@ -30,40 +30,113 @@
   var E = perDefecte();
 
   /* ------------------------------------------------------------ URL */
-  function desa() {
-    try {
-      location.replace('#' + btoa(unescape(encodeURIComponent(JSON.stringify(E)))));
-    } catch (e) { /* res */ }
+  function hashActual() {
+    return '#' + btoa(unescape(encodeURIComponent(JSON.stringify(E))));
   }
-  function llegeix() {
-    if (!location.hash || location.hash.length < 4) return;
-    try {
-      var o = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1)))));
-      if (o && o.codi) {
-        // fusiona amb els valors per defecte per si el catàleg ha canviat
-        var base = perDefecte();
-        ['codi', 'model', 'curs', 'data', 'nivell'].forEach(function (k) { if (o[k] !== undefined) base[k] = o[k]; });
-        if (o.part2) Object.keys(o.part2).forEach(function (k) { base.part2[k] = o.part2[k]; });
-        if (o.opcions) Object.keys(o.opcions).forEach(function (k) { base.opcions[k] = o.opcions[k]; });
-        if (o.portada) {
-          Object.keys(o.portada).forEach(function (k) {
-            if (k === 'parts') {
-              Object.keys(o.portada.parts || {}).forEach(function (r) {
-                if (base.portada.parts[r]) Object.keys(o.portada.parts[r]).forEach(function (c) {
-                  base.portada.parts[r][c] = o.portada.parts[r][c];
-                });
-              });
-            } else { base.portada[k] = o.portada[k]; }
+
+  /* L'adreça que reprodueix aquesta prova. Si el fitxer s'obre des del disc
+     (file://) no serveix de res, i fem servir l'adreça pública configurada. */
+  function adreca() {
+    if (location.protocol === 'file:') {
+      var b = (E.opcions.base || 'https://prova1eso.step-quiz.net/').trim();
+      return b.replace(/#.*$/, '').replace(/\/*$/, '/') + hashActual();
+    }
+    return location.origin + location.pathname + hashActual();
+  }
+
+  function desa() {
+    try { location.replace(hashActual()); } catch (e) { /* res */ }
+  }
+
+  /* --------------------------------------- desar la prova en un fitxer */
+  function fitxerDeLaProva() {
+    var u = adreca();
+    var titol = 'Prova inicial \u00b7 ' + E.curs + ' \u00b7 codi ' + E.codi + ' \u00b7 model ' + E.model;
+    var avui = new Date().toLocaleDateString('ca-ES');
+    return '<!DOCTYPE html>\n<html lang="ca"><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<title>' + titol + '</title><style>' +
+      'body{font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;' +
+      'background:#eceff2;margin:0;padding:40px 16px;color:#1a1a1a}' +
+      'main{max-width:640px;margin:0 auto;background:#fff;border-radius:10px;padding:32px 34px;' +
+      'box-shadow:0 1px 6px rgba(0,0,0,.14)}' +
+      'h1{color:#12507a;font-size:22px;margin:0 0 4px}' +
+      '.sub{color:#5a5a5a;margin:0 0 22px}' +
+      '.dades{background:#eef3f7;border-radius:7px;padding:12px 16px;margin:0 0 22px;font-size:15px}' +
+      '.dades b{color:#12507a}' +
+      'a.boto{display:inline-block;background:#12507a;color:#fff;text-decoration:none;font-weight:700;' +
+      'padding:12px 22px;border-radius:7px}' +
+      'a.boto:hover{background:#0e3f60}' +
+      'textarea{width:100%;height:88px;margin-top:8px;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;' +
+      'border:1px solid #c9d6e0;border-radius:6px;padding:8px;resize:vertical;color:#333}' +
+      '.peu{color:#5a5a5a;font-size:13px;margin-top:22px}' +
+      '</style></head><body><main>' +
+      '<h1>Prova inicial de Matem\u00e0tiques</h1>' +
+      '<p class="sub">' + E.curs + ' \u00b7 ' + E.data + '</p>' +
+      '<div class="dades">codi <b>' + E.codi + '</b> \u00b7 model <b>' + E.model + '</b><br>' +
+      'Aquesta adre\u00e7a torna a muntar exactament la mateixa prova: mateixes preguntes, ' +
+      'mateixos nombres i el text de la portada tal com el vas deixar.</div>' +
+      '<p><a class="boto" href="' + u + '">Obre la prova</a></p>' +
+      '<p class="peu">Si l\u2019enlla\u00e7 no s\u2019obre, copia aquesta adre\u00e7a al navegador:</p>' +
+      '<textarea readonly onclick="this.select()">' + u + '</textarea>' +
+      '<p class="peu">Desat el ' + avui + '. Aquest fitxer nom\u00e9s guarda l\u2019adre\u00e7a; ' +
+      'la prova es munta al navegador quan l\u2019obres.</p>' +
+      '</main></body></html>';
+  }
+
+  function desaFitxer() {
+    var b = new Blob([fitxerDeLaProva()], { type: 'text/html;charset=utf-8' });
+    var a = d.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = 'prova-1eso-' + E.codi + '-model-' + E.model + '.html';
+    d.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.parentNode.removeChild(a); }, 2000);
+  }
+  function fusiona(base, o) {
+    ['codi', 'model', 'curs', 'data', 'nivell'].forEach(function (k) { if (o[k] !== undefined) base[k] = o[k]; });
+    if (o.part2) Object.keys(o.part2).forEach(function (k) { base.part2[k] = o.part2[k]; });
+    if (o.opcions) Object.keys(o.opcions).forEach(function (k) { base.opcions[k] = o.opcions[k]; });
+    if (o.portada) {
+      Object.keys(o.portada).forEach(function (k) {
+        if (k === 'parts') {
+          Object.keys(o.portada.parts || {}).forEach(function (r) {
+            if (base.portada.parts[r]) Object.keys(o.portada.parts[r]).forEach(function (c) {
+              base.portada.parts[r][c] = o.portada.parts[r][c];
+            });
           });
-        }
-        [['part1', 'part1'], ['part3', 'part3']].forEach(function (par) {
-          (o[par[0]] || []).forEach(function (c) {
-            base[par[1]].forEach(function (b) { if (b.id === c.id) { b.on = c.on; b.subs = c.subs; b.nivell = c.nivell; } });
-          });
+        } else { base.portada[k] = o.portada[k]; }
+      });
+    }
+    ['part1', 'part3'].forEach(function (par) {
+      (o[par] || []).forEach(function (c) {
+        base[par].forEach(function (b) {
+          if (b.id === c.id) { b.on = c.on; b.subs = c.subs; b.nivell = c.nivell; }
         });
-        E = base;
-      }
-    } catch (e) { /* res */ }
+      });
+    });
+    return base;
+  }
+
+  /* els teus valors inicials, si te'ls has desat en aquest navegador */
+  var CLAU = 'prova1eso.inicials';
+  function desaInicials() { try { localStorage.setItem(CLAU, JSON.stringify(E)); } catch (e) { /* res */ } }
+  function treuInicials() { try { localStorage.removeItem(CLAU); } catch (e) { /* res */ } }
+  function llegeixInicials() {
+    try { var x = localStorage.getItem(CLAU); return x ? JSON.parse(x) : null; } catch (e) { return null; }
+  }
+
+  function llegeix() {
+    var base = perDefecte();
+    var meus = llegeixInicials();
+    if (meus) { base = fusiona(base, meus); base.codi = meus.codi ? w.codiNou() : base.codi; }
+    if (location.hash && location.hash.length > 4) {
+      try {
+        var o = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1)))));
+        if (o && o.codi) base = fusiona(base, o);
+      } catch (e) { /* adreça malmesa: seguim amb el que tenim */ }
+    }
+    E = base;
   }
 
   /* --------------------------------------------------------- widgets */
@@ -237,7 +310,7 @@
     /* --- portada */
     var gp = bloc('Portada',
       'Tot el text de la portada s\u2019escriu <b>directament sobre el full</b>: clica-hi a sobre i reescriu-lo. ' +
-      'El que posis entre claus \u2014 {codi}, {curs}, {preg1}, {min1}\u2026 \u2014 se substitueix pel valor de cada moment.');
+      'El que posis entre claus \u2014 {codi}, {curs}, {data}, {preg1}\u2026 \u2014 se substitueix pel valor de cada moment.');
     gp.appendChild(check('incloure la portada', E.opcions.portada, function (v) { E.opcions.portada = v; }));
     var rp = el('button', 'sec', 'Recupera el text original');
     rp.addEventListener('click', function () { E.portada = w.FULL.portadaPerDefecte(); pinta(); });
@@ -253,13 +326,27 @@
     });
     md.addEventListener('change', function () { E.opcions.mida = parseInt(md.value, 10); pinta(); });
     g4.appendChild(fila('Fulls de CB', md));
-    g4.appendChild(fila('Minuts Part 1', num(E.opcions.min1, 0, 60, function (v) { E.opcions.min1 = v; })));
-    g4.appendChild(fila('Minuts Part 2', num(E.opcions.min2, 0, 60, function (v) { E.opcions.min2 = v; })));
-    g4.appendChild(fila('Minuts Part 3', num(E.opcions.min3, 0, 60, function (v) { E.opcions.min3 = v; })));
-    var rb = el('button', 'sec', 'Torna als valors inicials');
-    rb.addEventListener('click', function () { E = perDefecte(); pinta(); });
-    g4.appendChild(fila('', rb));
+    var ba = el('input', 'txt'); ba.value = E.opcions.base || '';
+    ba.title = 'On \u00e9s publicada aquesta eina. S\u2019utilitza per al bot\u00f3 «Desar la prova en PC local».';
+    ba.addEventListener('change', function () { E.opcions.base = ba.value.trim(); pinta(); });
+    g4.appendChild(fila('Adre\u00e7a p\u00fablica', ba));
     p.appendChild(g4);
+
+    /* --- valors inicials */
+    var g5 = bloc('Valors inicials',
+      'Deixa-ho tot com t\u2019agrada i desa-ho: cada vegada que obris l\u2019eina en aquest navegador ' +
+      'sortir\u00e0 aix\u00ed, amb un codi nou.');
+    var bd = el('button', null, 'Desa aquests valors com a inicials');
+    bd.addEventListener('click', function () {
+      desaInicials();
+      bd.textContent = 'Desat \u2713';
+      setTimeout(function () { bd.textContent = 'Desa aquests valors com a inicials'; }, 1600);
+    });
+    g5.appendChild(fila('', bd));
+    var rb = el('button', null, 'Torna als valors de f\u00e0brica');
+    rb.addEventListener('click', function () { treuInicials(); E = perDefecte(); pinta(); });
+    g5.appendChild(fila('', rb));
+    p.appendChild(g5);
   }
 
   function gen(id) {
@@ -340,11 +427,9 @@
     var doc = w.composa(E);
     d.getElementById('prova').innerHTML = w.FULL.prova(E, doc);
     d.getElementById('clau').innerHTML = w.FULL.clau(E, doc);
-    var t = (E.opcions.min1 * (doc.part1.length ? 1 : 0)) + (E.opcions.min2 * (doc.nPreg2 ? 1 : 0)) +
-      (E.opcions.min3 * (doc.part3.length ? 1 : 0));
     d.getElementById('resum').innerHTML =
       '<b>' + doc.part1.length + '</b> preguntes obertes \u00b7 <b>' + doc.nPreg2 + '</b> de CB en ' +
-      doc.part2.length + ' fulls \u00b7 <b>' + doc.part3.length + '</b> reptes \u00b7 ~<b>' + t + ' min</b>';
+      doc.part2.length + ' fulls \u00b7 <b>' + doc.part3.length + '</b> reptes';
     panell();
     if (E.opcions.portada) editable();
     desa();
@@ -360,6 +445,7 @@
     llegeix();
     d.getElementById('imp-prova').addEventListener('click', function () { imprimeix('prova'); });
     d.getElementById('imp-clau').addEventListener('click', function () { imprimeix('clau'); });
+    d.getElementById('desa-fitxer').addEventListener('click', desaFitxer);
     d.getElementById('veure').addEventListener('change', function () {
       d.getElementById('centre').className = this.value;
     });

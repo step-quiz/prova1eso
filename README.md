@@ -64,12 +64,28 @@ El que escriguis entre claus se substitueix en imprimir:
 
 | | | | |
 |---|---|---|---|
-| `{codi}` `{model}` | `{curs}` `{data}` | `{n1}` `{n2}` `{n3}` nombre de preguntes | `{min1}` `{min2}` `{min3}` `{minuts}` |
+| `{codi}` `{model}` | `{curs}` `{data}` | `{n1}` `{n2}` `{n3}` nombre de preguntes | |
 
 `{preg1}` `{preg2}` `{preg3}` ja porten el nom i el plural resolts: *9 preguntes*, *1 repte*.
 
 En enganxar text només se'n conserven la negreta i la cursiva; la resta de format es descarta.
 Els botons i la nota groga d'ajuda no s'imprimeixen mai.
+
+### Desar la prova en PC local
+
+El botó de dalt baixa un **fitxer HTML petit** que només conté l'adreça d'aquesta prova exacta
+(`https://prova1eso.step-quiz.net/#eyJjb2RpIjoi…`), amb el codi i el model ben visibles. Obre'l amb
+doble clic i tens la prova tal com la vas deixar, portada inclosa. Va bé per guardar-la a la carpeta
+del curs o per passar-la a un company.
+
+L'adreça pública es configura a *El document → Adreça pública*. Si obres l'eina des d'un servidor
+(no des del disc), s'agafa l'adreça on està publicada i el camp s'ignora.
+
+### Els teus valors inicials
+
+*Valors inicials → Desa aquests valors com a inicials* guarda la configuració en aquest navegador:
+la propera vegada que obris l'eina, sortirà així, amb un codi nou. *Torna als valors de fàbrica*
+esborra el que has desat.
 
 ### Imprimir
 

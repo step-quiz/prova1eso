@@ -97,7 +97,7 @@
   /* ---- text editable de la portada ------------------------------------ */
   /* Tot el text de la portada viu aquí i es pot reescriure des de la pàgina.
      Entre claus, els valors que es calculen sols: {codi} {model} {curs} {data}
-     {n1} {n2} {n3} {preg1} {preg2} {preg3} {min1} {min2} {min3} {minuts} */
+     {n1} {n2} {n3} i {preg1} {preg2} {preg3} (amb el nom i el plural ja resolts) */
   function portadaPerDefecte() {
     return {
       titol: 'Prova inicial de Matem\u00e0tiques',
@@ -113,9 +113,9 @@
       ],
       h2parts: 'Com est\u00e0 organitzada',
       parts: {
-        p1: { nom: 'PART 1', desc: 'C\u00e0lcul i escriptura', quant: '{preg1}', temps: '{min1} min' },
-        p2: { nom: 'PART 2', desc: 'Situacions (una sola resposta correcta)', quant: '{preg2}', temps: '{min2} min' },
-        p3: { nom: 'PART 3', desc: 'Repte \u2014 <i>no cal acabar-lo</i>', quant: '{preg3}', temps: '{min3} min' }
+        p1: { nom: 'PART 1', desc: 'C\u00e0lcul i escriptura', quant: '{preg1}' },
+        p2: { nom: 'PART 2', desc: 'Situacions (una sola resposta correcta)', quant: '{preg2}' },
+        p3: { nom: 'PART 3', desc: 'Repte \u2014 <i>no cal acabar-lo</i>', quant: '{preg3}' }
       },
       extra: '',
       peu: 'codi {codi} \u00b7 model {model}'
@@ -132,15 +132,13 @@
   function plural(n, s, p) { return n + ' ' + (n === 1 ? s : p); }
 
   function vars(estat, doc) {
-    var n1 = doc.part1.length, n2 = doc.nPreg2, n3 = doc.part3.length, o = estat.opcions;
+    var n1 = doc.part1.length, n2 = doc.nPreg2, n3 = doc.part3.length;
     return {
       codi: estat.codi, model: estat.model, curs: estat.curs, data: estat.data,
       n1: n1, n2: n2, n3: n3,
       preg1: plural(n1, 'pregunta', 'preguntes'),
       preg2: plural(n2, 'pregunta', 'preguntes'),
-      preg3: plural(n3, 'repte', 'reptes'),
-      min1: o.min1, min2: o.min2, min3: o.min3,
-      minuts: (n1 ? o.min1 : 0) + (n2 ? o.min2 : 0) + (n3 ? o.min3 : 0)
+      preg3: plural(n3, 'repte', 'reptes')
     };
   }
 
@@ -165,7 +163,7 @@
       var P = estat.portada || portadaPerDefecte(), v = vars(estat, doc);
       h += '<section class="pagina portada">';
       h += '<p class="ed-nota">Escriu directament a sobre de qualsevol text d\u2019aquesta p\u00e0gina: es desa tot sol. ' +
-        'Pots fer servir <b>{codi}</b>, <b>{model}</b>, <b>{curs}</b>, <b>{data}</b>, <b>{preg1}</b>, <b>{min1}</b>\u2026 ' +
+        'Pots fer servir <b>{codi}</b>, <b>{model}</b>, <b>{curs}</b>, <b>{data}</b>, <b>{preg1}</b>\u2026 ' +
         'i s\u2019hi posar\u00e0 el valor de cada moment.</p>';
       h += '<h1>' + ed('portada.titol', subst(P.titol, v)) + '</h1>';
       h += '<p class="sub">' + ed('portada.subtitol', subst(P.subtitol, v)) + '</p>';
@@ -192,8 +190,7 @@
         var f = P.parts[x[0]], c = 'portada.parts.' + x[0] + '.';
         h += '<tr><td class="p">' + ed(c + 'nom', subst(f.nom, v)) + '</td>' +
           '<td>' + ed(c + 'desc', subst(f.desc, v)) + '</td>' +
-          '<td>' + ed(c + 'quant', subst(f.quant, v)) + '</td>' +
-          '<td class="t">' + ed(c + 'temps', subst(f.temps, v)) + '</td></tr>';
+          '<td class="t">' + ed(c + 'quant', subst(f.quant, v)) + '</td></tr>';
       });
       h += '</table>';
 
