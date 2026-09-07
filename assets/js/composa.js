@@ -29,6 +29,15 @@
     return out;
   }
 
+  /* Cada subapartat té la seva pròpia llavor. Així, regenerar-ne un no en toca cap
+     altre: si t'agrada la fracció que ha sortit, es queda tal com està encara que
+     canviïs la divisió del costat. El comptador que fa de "torna-ho a tirar" és
+     cfg.varia[i]; el del context compartit (tarifes, boles, família de figures)
+     és cfg.variaCap. */
+  function firma(s) {
+    return JSON.stringify([String(s.txt).replace(/<[^>]*>/g, ''), s.figura || null, s.sol]);
+  }
+
   function obertes(estat, part) {
     var res = [];
     (part === 1 ? estat.part1 : estat.part3).forEach(function (cfg, idx) {
@@ -36,16 +45,33 @@
       var g = generador(cfg.id);
       if (!g) return;
       var niv = cfg.nivell || estat.nivell;
-      var r = new w.Atzar(estat.codi + '|' + estat.model + '|' + g.id + '|' + niv + '|' + idx);
-      var ctx = g.context ? g.context(r, niv) : {};
+      var arrel = estat.codi + '|' + estat.model + '|' + g.id + '|' + niv + '|' + idx;
+      var ctx = g.context
+        ? g.context(new w.Atzar(arrel + '|ctx|' + (cfg.variaCap || 0)), niv)
+        : {};
       var n = Math.max(g.minSub, Math.min(g.maxSub, cfg.subs || g.defSub));
-      var subs = [];
-      for (var i = 0; i < n; i++) subs.push(g.sub(r, niv, i, ctx));
+      var subs = [], firmes = [];
+
+      for (var i = 0; i < n; i++) {
+        var v = (cfg.varia && cfg.varia[i]) || 0;
+        var s = null, f = null;
+        /* si surt igual que un apartat anterior (dues fraccions iguals, la mateixa
+           divisió dos cops...), es torna a tirar fins que sigui diferent */
+        for (var t = 0; t < 30; t++) {
+          s = g.sub(new w.Atzar(arrel + '|s' + i + '|' + (v + t)), niv, i, ctx);
+          f = firma(s);
+          if (firmes.indexOf(f) < 0) break;
+        }
+        firmes.push(f);
+        s.varia = v;
+        subs.push(s);
+      }
+
       res.push({
-        id: g.id, titol: g.titol, destresa: g.destresa, sentit: g.sentit,
+        id: g.id, part: part, titol: g.titol, destresa: g.destresa, sentit: g.sentit,
         nivell: niv, espai: g.espai, alt: g.alt || 0,
         cap: g.cap ? g.cap(niv, ctx) : '',
-        ctx: ctx, subs: subs,
+        ctx: ctx, ambCtx: !!g.context, subs: subs,
         figuraCap: !!g.figuraCap
       });
     });

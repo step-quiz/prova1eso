@@ -32,7 +32,7 @@
       probabilitat: { on: false, subs: 2 }
     },
     part2: { on: true, mode: 'auto', objectiu: 4, difMax: 2 },
-    opcions: { portada: true, fitxa: true, mida: 85, base: 'https://prova1eso.step-quiz.net/' }
+    opcions: { portada: true, fitxa: true, pagBlanca: false, mida: 85, base: 'https://prova1eso.step-quiz.net/' }
   };
 
   function ajust(taula, g) {
@@ -41,7 +41,9 @@
       id: g.id,
       on: f.on !== undefined ? f.on : true,
       subs: Math.max(g.minSub, Math.min(g.maxSub, f.subs !== undefined ? f.subs : g.defSub)),
-      nivell: 0
+      nivell: 0,
+      varia: [],      // un comptador per apartat: el botó ↻ del full el fa pujar
+      variaCap: 0     // el del context comú de l'exercici
     };
   }
 
@@ -63,6 +65,7 @@
         .map(function (g) { return ajust(FABRICA.part3, g); }),
       opcions: {
         portada: FABRICA.opcions.portada, fitxa: FABRICA.opcions.fitxa,
+        pagBlanca: FABRICA.opcions.pagBlanca || false,
         mida: FABRICA.opcions.mida, base: FABRICA.opcions.base
       },
       portada: w.FULL.portadaPerDefecte()
@@ -153,7 +156,10 @@
     ['part1', 'part3'].forEach(function (par) {
       (o[par] || []).forEach(function (c) {
         base[par].forEach(function (b) {
-          if (b.id === c.id) { b.on = c.on; b.subs = c.subs; b.nivell = c.nivell; }
+          if (b.id !== c.id) return;
+          b.on = c.on; b.subs = c.subs; b.nivell = c.nivell;
+          if (c.varia) b.varia = c.varia.slice();
+          if (c.variaCap) b.variaCap = c.variaCap;
         });
       });
     });
@@ -354,6 +360,12 @@
       'Tot el text de la portada s\u2019escriu <b>directament sobre el full</b>: clica-hi a sobre i reescriu-lo. ' +
       'El que posis entre claus \u2014 {codi}, {curs}, {data}, {preg1}\u2026 \u2014 se substitueix pel valor de cada moment.');
     gp.appendChild(check('incloure la portada', E.opcions.portada, function (v) { E.opcions.portada = v; }));
+    gp.appendChild(check('pregunta d\u2019actitud amb caselles', E.portada.actitud.on,
+      function (v) { E.portada.actitud.on = v; }));
+    if (E.portada.actitud.on) {
+      gp.appendChild(fila('Ratlles per escriure',
+        num(E.portada.actitud.ratlles, 0, 8, function (v) { E.portada.actitud.ratlles = v; })));
+    }
     var rp = el('button', 'sec', 'Recupera el text original');
     rp.addEventListener('click', function () { E.portada = w.FULL.portadaPerDefecte(); pinta(); });
     gp.appendChild(fila('', rp));
@@ -362,6 +374,8 @@
     /* --- opcions */
     var g4 = bloc('El document');
     g4.appendChild(check('fitxa de respostes de la Part 2', E.opcions.fitxa, function (v) { E.opcions.fitxa = v; }));
+    g4.appendChild(check('full en blanc despr\u00e9s de la portada', E.opcions.pagBlanca,
+      function (v) { E.opcions.pagBlanca = v; }));
     var md = el('select', 'niv');
     [[100, 'grans (100 %)'], [85, 'normals (85 %)'], [70, 'petits (70 %) — menys paper']].forEach(function (o) {
       md.appendChild(new Option(o[1], String(o[0]), false, E.opcions.mida === o[0]));
@@ -459,6 +473,19 @@
         if (b.dataset.accio === 'avis-afegeix') P.avisos.push('Escriu aqu\u00ed el teu av\u00eds.');
         if (b.dataset.accio === 'camp-treu' && P.camps.length > 1) P.camps.splice(i, 1);
         if (b.dataset.accio === 'camp-afegeix') P.camps.push('Camp nou');
+        if (b.dataset.accio === 'act-treu' && P.actitud.opcions.length > 1) P.actitud.opcions.splice(i, 1);
+        if (b.dataset.accio === 'act-afegeix') P.actitud.opcions.push('Opci\u00f3 nova');
+        if (b.dataset.accio === 'refes') {
+          var llista = b.dataset.part === '3' ? E.part3 : E.part1;
+          llista.forEach(function (c) {
+            if (c.id !== b.dataset.gen) return;
+            if (i < 0) { c.variaCap = (c.variaCap || 0) + 1; }
+            else {
+              c.varia = c.varia || [];
+              c.varia[i] = (c.varia[i] || 0) + 1;
+            }
+          });
+        }
         pinta();
       });
     });
@@ -473,14 +500,36 @@
       '<b>' + doc.part1.length + '</b> preguntes obertes \u00b7 <b>' + doc.nPreg2 + '</b> de CB en ' +
       doc.part2.length + ' fulls \u00b7 <b>' + doc.part3.length + '</b> reptes';
     panell();
-    if (E.opcions.portada) editable();
+    editable();
     desa();
   }
 
-  function imprimeix(quin) {
+  /* La cap\u00e7alera i el peu (data, t\u00edtol, adre\u00e7a, 1/9) els posa el navegador,
+     no el document: no hi ha CSS que els tregui. Nom\u00e9s es poden desmarcar al
+     di\u00e0leg d'impressi\u00f3, aix\u00ed que ho recordem la primera vegada. */
+  var CLAU_AVIS = 'prova1eso.avisImprimir';
+
+  function aImprimir(quin) {
     d.body.className = 'imp-' + quin;
     w.print();
     setTimeout(function () { d.body.className = ''; }, 400);
+  }
+
+  function imprimeix(quin) {
+    var vist = false;
+    try { vist = localStorage.getItem(CLAU_AVIS) === '1'; } catch (e) { /* res */ }
+    if (vist) { aImprimir(quin); return; }
+
+    var capa = d.getElementById('avis');
+    capa.hidden = false;
+    d.getElementById('avis-ok').onclick = function () {
+      try {
+        if (d.getElementById('avis-mai').checked) localStorage.setItem(CLAU_AVIS, '1');
+      } catch (e) { /* res */ }
+      capa.hidden = true;
+      setTimeout(function () { aImprimir(quin); }, 80);
+    };
+    d.getElementById('avis-cancela').onclick = function () { capa.hidden = true; };
   }
 
   d.addEventListener('DOMContentLoaded', function () {

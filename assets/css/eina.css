@@ -100,8 +100,10 @@ table.parts .t{color:var(--gris); font-style:italic; text-align:right}
 .enun .num{font-weight:700; color:var(--blau); margin-right:2mm}
 .subs{margin:2mm 0 0 6mm}
 .subs.cols{display:grid; grid-template-columns:1fr 1fr; gap:3mm 5mm}
-.sub{margin:1.5mm 0}
-.sub .ap{font-weight:700; color:var(--gris); margin-right:1.5mm}
+/* els subapartats (a, b, c...). Fins ara compartien la classe .sub amb els
+   subtítols i heretaven el seu estil sense voler: ara el porten escrit. */
+.pagina .apartat{ color:var(--gris); font-size:10pt; margin:0 0 4mm }
+.apartat .ap{ font-weight:700; color:var(--gris); margin-right:1.5mm }
 .caixa{display:inline-block; width:22mm; height:8mm; border:1px solid #8fa6b6; border-radius:2px; vertical-align:middle; margin:0 2mm}
 .op{color:var(--gris)}
 .linia{display:inline-block; min-width:60mm; border-bottom:1px solid #98a9b6; height:6mm; vertical-align:bottom}
@@ -113,7 +115,7 @@ table.parts .t{color:var(--gris); font-style:italic; text-align:right}
 .ratlles{margin:2mm 0}
 .ratlla{border-bottom:1px solid #b9c6d1; height:7.5mm}
 .fig{display:block; margin:2mm 0 3mm}
-.fig-sub{display:flex; align-items:center; gap:3mm}
+.fig-apartat{display:flex; align-items:center; gap:3mm}
 
 .cb{margin:0 0 7mm; page-break-inside:avoid; break-inside:avoid}
 .cb-cap{display:flex; align-items:center; gap:3mm; margin-bottom:1.5mm}
@@ -158,3 +160,35 @@ table.clau tr{page-break-inside:avoid}
 }
 .ed-btn:hover{ background:#f2f6f9; color:var(--blau); border-color:#9fc0d6; }
 .dades label .ed-btn{ float:right; }
+
+/* ------------------------------------- avís abans d'imprimir */
+.capa{
+  position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
+  background:rgba(10,28,44,.45); padding:20px;
+}
+.capa[hidden]{ display:none; }
+.quadre{
+  background:#fff; border-radius:10px; padding:24px 26px; max-width:520px;
+  box-shadow:0 10px 40px rgba(0,0,0,.28);
+}
+.quadre h2{ margin:0 0 10px; color:var(--blau); font-size:18px }
+.quadre p{ margin:0 0 12px; font-size:14.5px; line-height:1.5 }
+.quadre ul{ margin:0 0 12px; padding-left:20px; font-size:14px; line-height:1.6 }
+.quadre .menut{ font-size:13px; color:var(--gris) }
+.quadre .check{ margin:14px 0 18px; font-size:13.5px }
+.quadre .botons{ display:flex; gap:10px; justify-content:flex-end }
+.quadre button{ background:var(--blau); color:#fff; border:0; padding:9px 18px; border-radius:6px; font-weight:600 }
+.quadre button:hover{ background:#0e3f60 }
+.quadre button.pla{ background:#eceff2; color:var(--gris) }
+.quadre button.pla:hover{ background:#e0e5ea }
+
+/* ------------------------------------------- pregunta d'actitud */
+ul.actitud{ list-style:none; margin:2mm 0 3mm; padding:0 }
+ul.actitud li{ display:flex; align-items:center; gap:4mm; margin:0 0 4mm; font-size:10.5pt }
+.casella{
+  flex:0 0 auto; width:5mm; height:5mm; border:1.2px solid #33546b;
+  border-radius:1px; display:inline-block;
+}
+.act-obert{ margin:5mm 0 2mm; font-size:10.5pt }
+.pagina.blanca{ display:flex; align-items:flex-start }
+.ed-btn.refes{ font-size:12px; padding:1px 6px 2px }

@@ -37,3 +37,6 @@ img{ max-width:100%; }
 .ed-btn, .ed-nota{ display:none !important; }
 .ed:hover, .ed:focus{ box-shadow:none !important; outline:0 !important; background:transparent !important; }
 .ed:empty::before{ content:'' !important; }
+
+/* l'avís no forma part del document */
+.capa{ display:none !important; }

@@ -59,28 +59,32 @@
 
   function subHTML(it, s, i) {
     var lletra = '<span class="ap">' + LL[i] + ')</span> ';
+    var refes = botoRefes(it, i);
     if (it.id === 'fraccio') {
-      return '<div class="sub fig-sub">' + lletra + barra(s.figura.parts, s.figura.pintades) +
-        '<span class="caixa"></span></div>';
+      return '<div class="apartat fig-apartat">' + lletra + barra(s.figura.parts, s.figura.pintades) +
+        '<span class="caixa"></span>' + refes + '</div>';
     }
     if (it.espai === 'caixes') {
       var caixes = s.caixes || 1, c = '';
       for (var k = 0; k < caixes; k++) c += '<span class="caixa"></span>' + (k < caixes - 1 ? '<span class="op">&lt;</span>' : '');
-      return '<div class="sub">' + lletra + s.txt + ' &nbsp; ' + c + '</div>';
+      return '<div class="apartat">' + lletra + s.txt + ' &nbsp; ' + c + refes + '</div>';
     }
     if (it.espai === 'linia') {
-      return '<div class="sub">' + lletra + s.txt + ' <span class="linia"></span></div>';
+      return '<div class="apartat">' + lletra + s.txt + ' <span class="linia"></span>' + refes + '</div>';
     }
     if (it.espai === 'graella') {
       var t = s.txt.length < 40 ? '<b>' + s.txt + '</b>' : s.txt;
-      return '<div class="sub sub-graella">' + lletra + t + espai('graella', s.alt || it.alt) + '</div>';
+      return '<div class="apartat apartat-graella">' + lletra + t + refes + espai('graella', s.alt || it.alt) + '</div>';
     }
-    return '<div class="sub">' + lletra + s.txt + espai(s.espai || it.espai, s.alt || it.alt) + '</div>';
+    return '<div class="apartat">' + lletra + s.txt + refes +
+      espai(s.espai || it.espai, s.alt || it.alt) + '</div>';
   }
 
   function itemHTML(it, num) {
     var h = '<div class="item"><div class="enun"><span class="num">' + num + '.</span> ';
     h += it.cap || it.subs[0].txt;
+    if (it.ambCtx) h += botoRefes(it, -1);
+    else if (!it.cap && it.subs.length === 1) h += botoRefes(it, 0);
     h += '</div>';
     if (it.figuraCap && it.ctx.fam) h += seqFigures(it.ctx.fam);
     var multi = it.subs.length > 1 || it.cap;
@@ -115,6 +119,17 @@
         p2: { nom: 'PART 2', desc: 'Problemes', quant: '{preg2}' },
         p3: { nom: 'PART 3', desc: 'Reptes', quant: '{preg3}' }
       },
+      actitud: {
+        on: false,
+        titol: 'Creus que t\u2019agraden, les Matem\u00e0tiques?',
+        opcions: [
+          'S\u00ed, m\u2019agraden bastant o molt',
+          'Em costen una mica, per\u00f2 m\u2019hi esfor\u00e7o molt',
+          'La veritat \u00e9s que no m\u2019agraden'
+        ],
+        obert: 'Em vols explicar alguna cosa m\u00e9s? Endavant!',
+        ratlles: 2
+      },
       extra: '',
       peu: '<br>'
     };
@@ -145,6 +160,14 @@
     tag = tag || 'span';
     return '<' + tag + ' class="ed' + (cls ? ' ' + cls : '') + '" data-camp="' + cami + '">' +
       txt + '</' + tag + '>';
+  }
+
+  /* el "torna-ho a tirar" d'un apartat concret (i = -1 vol dir el context comú) */
+  function botoRefes(it, i) {
+    return '<button class="ed-btn refes" data-accio="refes" data-part="' + it.part +
+      '" data-gen="' + it.id + '" data-i="' + i + '" title="' +
+      (i < 0 ? 'canvia l\u2019enunciat comú' : 'uns altres nombres en aquest apartat') +
+      '">\u21bb</button>';
   }
 
   function botoEd(accio, i, txt, titol) {
@@ -192,9 +215,29 @@
       });
       h += '</table>';
 
+      var A = P.actitud;
+      if (A && A.on) {
+        h += '<h2>' + ed('portada.actitud.titol', subst(A.titol, v)) + '</h2>';
+        h += '<ul class="actitud">';
+        A.opcions.forEach(function (o, i) {
+          h += '<li><span class="casella"></span>' +
+            ed('portada.actitud.opcions.' + i, subst(o, v)) +
+            botoEd('act-treu', i, '\u00d7', 'treu aquesta opci\u00f3') + '</li>';
+        });
+        h += '</ul>' + botoEd('act-afegeix', null, '+ opci\u00f3', 'afegeix una opci\u00f3');
+        h += ed('portada.actitud.obert', subst(A.obert, v), 'p', 'act-obert');
+        for (var nr = 0; nr < (A.ratlles || 0); nr++) h += '<div class="ratlla"></div>';
+      }
+
       h += ed('portada.extra', subst(P.extra, v), 'p', 'extra');
       h += ed('portada.peu', subst(P.peu, v), 'p', 'codi-peu');
       h += '</section>';
+
+      if (estat.opcions.pagBlanca) {
+        h += '<section class="pagina blanca">' +
+          '<p class="ed-nota">Full en blanc, per\u00f2 que la Part 1 comenci a la p\u00e0gina de la dreta ' +
+          'quan imprimeixis a doble cara. Es treu a «El document».</p>&nbsp;</section>';
+      }
     }
 
     if (nPart1) {

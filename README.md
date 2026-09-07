@@ -71,6 +71,27 @@ El que escriguis entre claus se substitueix en imprimir:
 En enganxar text només se'n conserven la negreta i la cursiva; la resta de format es descarta.
 Els botons i la nota groga d'ajuda no s'imprimeixen mai.
 
+### Canviar només un apartat
+
+Cada subapartat porta un botó **↻** a la dreta (només a la pantalla; no s'imprimeix). Li dones i
+**només aquell apartat** treu uns altres nombres: la fracció que t'agradava es queda igual encara que
+canviïs la divisió del costat. Els exercicis que tenen un enunciat comú —les tarifes, la bossa de
+boles, la família de figures del patró— tenen el seu ↻ al costat del títol, per canviar el context sencer.
+
+Cap exercici repeteix apartat: si dues fraccions o dues divisions surten iguals, la segona es torna
+a tirar fins que és diferent.
+
+### La pregunta d'actitud
+
+A *Portada → pregunta d'actitud amb caselles* s'afegeix un bloc amb caselles de veritat, tantes
+opcions com vulguis (`+ opció` i `×`), una línia oberta i les ratlles que decideixis. Tot el text és
+editable com la resta de la portada.
+
+### El full en blanc
+
+A *El document → full en blanc després de la portada*: deixa un full buit perquè, imprimint a doble
+cara, la portada quedi sola i la Part 1 comenci a la pàgina de la dreta.
+
 ### Desar la prova en PC local
 
 El botó de dalt baixa un **fitxer HTML petit** que només conté l'adreça d'aquesta prova exacta
@@ -97,7 +118,11 @@ esborra el que has desat.
 ### Imprimir
 
 Dos botons: **la prova** (alumnat) i **la clau** (professorat, amb el diagnòstic per distractor).
-Al diàleg del navegador, desmarca *Capçaleres i peus de pàgina*. Els marges els posa `@page`.
+
+**La data, el títol, l'adreça i el `1/9` que surten a dalt i a baix de cada full els posa el navegador**,
+no el document: cap CSS els pot treure. Es desmarquen al mateix diàleg d'impressió —a Chrome i Edge,
+*Més configuració → Capçaleres i peus de pàgina*— i el navegador ho recorda. L'eina t'ho recorda la
+primera vegada que imprimeixes. Els marges, deixa'ls en *Per defecte*: els de veritat els posa `@page`.
 
 Amb la configuració que ve de sèrie: 7 obertes + 4 de CB + 1 repte = **8 pàgines** (4 fulls a doble cara). Si vas just de fotocòpies, a *El document → Fulls de CB* baixa'ls al 70 %.
 
@@ -193,12 +218,3 @@ exactament tres.
 No corregeix. No guarda respostes de l'alumnat. No fa estadística de grup.
 Si això et fa falta, el pas natural és exportar un CSV amb la clau (`full.js` ja la té muntada)
 i buidar-lo al full de càlcul que ja facis servir.
-
-<!-- atribucio-centre:inici -->
-
----
-
-Material desenvolupat per **David Arso Civil** per al Departament de Matemàtiques de l'INS Miquel Tarradell.
-Contingut sota CC BY-NC-SA 4.0, codi sota llicència MIT. Vegeu [`LLICENCIA.md`](LLICENCIA.md).
-
-<!-- atribucio-centre:final -->

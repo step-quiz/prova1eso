@@ -21,11 +21,11 @@ function estatBase() {
   return {
     codi: 'K7M2P', model: 'A', curs: '1r ESO', data: '10-09-2026', nivell: 2,
     part1: w.GENERADORS.filter(function (g) { return g.part === 1; })
-      .map(function (g) { return { id: g.id, on: true, subs: g.defSub, nivell: 0 }; }),
+      .map(function (g) { return { id: g.id, on: true, subs: g.defSub, nivell: 0, varia: [], variaCap: 0 }; }),
     part2: { on: true, mode: 'auto', objectiu: 19, difMax: 2, sentits: ['numeric', 'algebraic', 'espacial', 'mesura', 'estocastic'], tria: [] },
     part3: w.GENERADORS.filter(function (g) { return g.part === 3; })
-      .map(function (g, i) { return { id: g.id, on: i < 2, subs: g.defSub, nivell: 0 }; }),
-    opcions: { portada: true, fitxa: true, mida: 85, base: 'https://exemple.net/' },
+      .map(function (g, i) { return { id: g.id, on: i < 2, subs: g.defSub, nivell: 0, varia: [], variaCap: 0 }; }),
+    opcions: { portada: true, fitxa: true, pagBlanca: false, mida: 85, base: 'https://exemple.net/' },
     portada: w.FULL.portadaPerDefecte()
   };
 }
@@ -143,6 +143,59 @@ var h4 = w.FULL.prova(e4, w.composa(e4));
 comprova('el text reescrit surt al full', h4.indexOf('Prova de setembre') > 0 && h4.indexOf('Nom\u00e9s un av\u00eds.') > 0);
 comprova('el plural es resol', /\d+ preguntes|1 pregunta/.test(portadaImpresa));
 comprova('cap rastre dels minuts per part', !/\{min[123]\}|\{minuts\}/.test(html));
+
+/* 8. cap apartat repetit dins d'un mateix exercici */
+console.log('sense repeticions');
+['fraccio', 'resta', 'suma', 'multiplicacio', 'divisio', 'percentatges', 'ordena', 'problema1', 'problema2']
+  .forEach(function (id) {
+    for (var k = 0; k < 120; k++) {
+      var ee = estatBase();
+      ee.codi = 'C' + ('0000' + k).slice(-4);
+      ee.nivell = (k % 3) + 1;
+      ee.part1.forEach(function (c) {
+        c.on = (c.id === id);
+        var g = w.GENERADORS.filter(function (x) { return x.id === id; })[0];
+        c.subs = Math.min(g.maxSub, 3);
+      });
+      ee.part2.on = false;
+      ee.part3.forEach(function (c) { c.on = false; });
+      var it = w.composa(ee).part1[0];
+      var vistos = it.subs.map(function (s) {
+        return String(s.txt).replace(/<[^>]*>/g, '') + JSON.stringify(s.figura || null);
+      });
+      comprova(id + ' k=' + k + ': ' + it.subs.length + ' apartats diferents',
+        new Set(vistos).size === vistos.length);
+    }
+  });
+
+/* 9. regenerar un apartat no en toca cap altre */
+console.log('regenerar');
+var e5 = estatBase();
+e5.part1.forEach(function (c) { c.on = (c.id === 'divisio' || c.id === 'fraccio'); c.subs = 3; });
+e5.part2.on = false; e5.part3.forEach(function (c) { c.on = false; });
+var abans = w.composa(e5).part1.map(function (it) { return it.subs.map(function (s) { return s.txt; }); });
+e5.part1.forEach(function (c) { if (c.id === 'divisio') c.varia = [0, 1, 0]; });
+var despres = w.composa(e5).part1.map(function (it) { return it.subs.map(function (s) { return s.txt; }); });
+comprova('l\u2019apartat regenerat canvia', abans[0][1] !== despres[0][1]);
+comprova('els altres apartats del mateix exercici es queden',
+  abans[0][0] === despres[0][0] && abans[0][2] === despres[0][2]);
+comprova('les fraccions de l\u2019exercici del costat no es mouen',
+  JSON.stringify(abans[1]) === JSON.stringify(despres[1]));
+
+/* 10. full en blanc i pregunta d'actitud */
+console.log('portada: opcions noves');
+var e6 = estatBase();
+comprova('sense full en blanc per defecte', w.FULL.prova(e6, w.composa(e6)).indexOf('pagina blanca') < 0);
+e6.opcions.pagBlanca = true;
+comprova('amb el full en blanc activat', w.FULL.prova(e6, w.composa(e6)).indexOf('pagina blanca') > 0);
+var e7 = estatBase();
+comprova('actitud apagada per defecte', !e7.portada.actitud.on &&
+  w.FULL.prova(e7, w.composa(e7)).indexOf('ul class="actitud"') < 0);
+e7.portada.actitud.on = true;
+var h7 = w.FULL.prova(e7, w.composa(e7));
+comprova('actitud amb 3 caselles de veritat', (h7.match(/<span class="casella">/g) || []).length === 3);
+comprova('actitud editable', h7.indexOf('data-camp="portada.actitud.opcions.0"') > 0);
+comprova('la resta de la portada segueix', h7.indexOf('data-camp="portada.titol"') > 0);
 
 console.log('\n' + ok + ' comprovacions correctes, ' + ko + ' errors');
 process.exit(ko ? 1 : 0);
