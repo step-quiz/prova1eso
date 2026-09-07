@@ -193,3 +193,12 @@ exactament tres.
 No corregeix. No guarda respostes de l'alumnat. No fa estadística de grup.
 Si això et fa falta, el pas natural és exportar un CSV amb la clau (`full.js` ja la té muntada)
 i buidar-lo al full de càlcul que ja facis servir.
+
+<!-- atribucio-centre:inici -->
+
+---
+
+Material desenvolupat per **David Arso Civil** per al Departament de Matemàtiques de l'INS Miquel Tarradell.
+Contingut sota CC BY-NC-SA 4.0, codi sota llicència MIT. Vegeu [`LLICENCIA.md`](LLICENCIA.md).
+
+<!-- atribucio-centre:final -->
