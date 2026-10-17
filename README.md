@@ -146,7 +146,7 @@ tota sola, i el col·loca just abans del full que el necessita.
 ## Estructura
 
 ```
-prova-inicial/
+prova1eso/
   index.html
   assets/css/eina.css        pantalla i aspecte del full
   assets/css/imprimir.css    @page A4, salts de pàgina
@@ -159,10 +159,12 @@ prova-inicial/
   cb-img/p01.png … p28.png   els fulls de CB retallats (150 dpi)
   tools/tests.js             proves: node tools/tests.js
   exemple/                   una prova i una clau ja impreses, per mirar
+  _uploads/                  carpeta per pujar-hi ZIP (vegeu més avall)
+  .github/workflows/unzip-upload.yml   descomprimeix els ZIP de _uploads/
 ```
 
 **Res de `fetch()`**: obert amb `file://` el navegador el bloqueja. Per això les dades són
-fitxers `.js` que assignen a `window`, com a `eina/`.
+fitxers `.js` que assignen a `window` (com a `recu` i `repas`).
 
 ---
 
@@ -172,7 +174,7 @@ fitxers `.js` que assignen a `window`, com a `eina/`.
 node tools/tests.js
 ```
 
-Comprova 1439 coses, i les tres que fan mal en paper:
+Fa unes 2.500 comprovacions. Les que importen més, perquè fan mal en paper:
 
 - que **cada solució quadri** (es recalcula l'aritmètica de restes, sumes i multiplicacions a partir de l'enunciat imprès, 300 casos);
 - que els nombres en lletres estiguin bé (`3207` → *tres mil dos-cents set*);
@@ -181,6 +183,14 @@ Comprova 1439 coses, i les tres que fan mal en paper:
 - que totes les imatges referenciades **existeixin** al disc.
 
 Si toques `generadors.js` o `cb.js`, torna-ho a passar abans d'imprimir 30 còpies.
+
+---
+
+## Pujar canvis amb un ZIP
+
+Un ZIP pujat a `_uploads/` el descomprimeix el workflow `unzip-upload.yml` a l'arrel del repositori
+i en fa un commit. El ZIP ha de tenir l'estructura de carpetes de l'arrel (per exemple
+`assets/js/cb.js`). Els fitxers de `.github/workflows/` no es poden pujar per ZIP.
 
 ---
 
