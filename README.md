@@ -160,6 +160,7 @@ prova1eso/
   tools/tests.js             proves: node tools/tests.js
   exemple/                   una prova i una clau ja impreses, per mirar
   _uploads/                  carpeta per pujar-hi ZIP (vegeu més avall)
+  .github/workflows/tests.yml          les comprovacions, a cada push i PR
   .github/workflows/unzip-upload.yml   descomprimeix els ZIP de _uploads/
 ```
 
@@ -190,7 +191,8 @@ Si toques `generadors.js` o `cb.js`, torna-ho a passar abans d'imprimir 30 còpi
 
 Un ZIP pujat a `_uploads/` el descomprimeix el workflow `unzip-upload.yml` a l'arrel del repositori
 i en fa un commit. El ZIP ha de tenir l'estructura de carpetes de l'arrel (per exemple
-`assets/js/cb.js`). Els fitxers de `.github/workflows/` no es poden pujar per ZIP.
+`assets/js/cb.js`). Els fitxers de `.github/workflows/` no es poden pujar per ZIP. Després de
+desar, el workflow llança `tests.yml`, que passa `node tools/tests.js` (també a cada push i PR).
 
 ---
 
